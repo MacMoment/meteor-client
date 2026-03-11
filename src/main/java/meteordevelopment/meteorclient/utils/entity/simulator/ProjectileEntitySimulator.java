@@ -134,7 +134,9 @@ public class ProjectileEntitySimulator {
         // I lost my mind for an hour trying to figure out why arrows and tridents were spawning lower than expected,
         // and it was because no slow air strict was silently causing the player to crouch AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         EntityPose pose = user.getPose();
-        if (user == mc.player && (Modules.get().get(NoSlow.class).airStrict() || Modules.get().get(Sneak.class).doPacket())) pose = EntityPose.CROUCHING;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        Sneak sneak = Modules.get().get(Sneak.class);
+        if (user == mc.player && ((noSlow != null && noSlow.airStrict()) || (sneak != null && sneak.doPacket()))) pose = EntityPose.CROUCHING;
         Utils.set(pos, user, tickDelta).add(0, user.getEyeHeight(pose) - 0.1f, 0);
 
         double yaw;
@@ -195,7 +197,9 @@ public class ProjectileEntitySimulator {
         double k = Math.sin(-pitch * 0.017453292F);
 
         EntityPose pose = user.getPose();
-        if (user == mc.player && (Modules.get().get(NoSlow.class).airStrict() || Modules.get().get(Sneak.class).doPacket())) pose = EntityPose.CROUCHING;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        Sneak sneak = Modules.get().get(Sneak.class);
+        if (user == mc.player && ((noSlow != null && noSlow.airStrict()) || (sneak != null && sneak.doPacket()))) pose = EntityPose.CROUCHING;
         Utils.set(pos, user, tickDelta).sub(i * 0.3, 0, h * 0.3).add(0, user.getEyeHeight(pose), 0);
 
         velocity.set(-i, MathHelper.clamp(-(k / j), -5, 5), -h);

@@ -130,6 +130,7 @@ public class ContainerInventoryScreen extends Screen {
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
+        if (tooltips == null) return false;
 
         ItemStack stack = getSelectedItem((int) click.x(), (int) click.y());
         if (tooltips.shouldOpenContents(click)) {
@@ -144,7 +145,7 @@ public class ContainerInventoryScreen extends Screen {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
 
         ItemStack stack = getSelectedItem((int) mc.mouse.getScaledX(mc.getWindow()), (int) mc.mouse.getScaledY(mc.getWindow()));
-        if (tooltips.shouldOpenContents(input)) {
+        if (tooltips != null && tooltips.shouldOpenContents(input)) {
             return tooltips.openContent(stack);
         }
 

@@ -70,6 +70,7 @@ public class SongDecoders {
      */
     private static void fixSong(Song song) {
         Notebot notebot = Modules.get().get(Notebot.class);
+        if (notebot == null) return;
 
         var iterator = song.getNotesMap().entries().iterator();
         while (iterator.hasNext()) {

@@ -16,7 +16,7 @@ public class EntityOutlineShader extends EntityShader {
     @Override
     protected boolean shouldDraw() {
         if (esp == null) esp = Modules.get().get(ESP.class);
-        return esp.isShader();
+        return esp != null && esp.isShader();
     }
 
     @Override

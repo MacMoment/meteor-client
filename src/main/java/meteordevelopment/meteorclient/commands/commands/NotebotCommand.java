@@ -53,30 +53,35 @@ public class NotebotCommand extends Command {
 
         builder.then(literal("status").executes(ctx -> {
             Notebot notebot = Modules.get().get(Notebot.class);
+            if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
             info(notebot.getStatus());
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("pause").executes(ctx -> {
             Notebot notebot = Modules.get().get(Notebot.class);
+            if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
             notebot.pause();
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("resume").executes(ctx -> {
             Notebot notebot = Modules.get().get(Notebot.class);
+            if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
             notebot.pause();
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("stop").executes(ctx -> {
             Notebot notebot = Modules.get().get(Notebot.class);
+            if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
             notebot.stop();
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("randomsong").executes(ctx -> {
             Notebot notebot = Modules.get().get(Notebot.class);
+            if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
             notebot.playRandomSong();
             return SINGLE_SUCCESS;
         }));
@@ -85,6 +90,7 @@ public class NotebotCommand extends Command {
             literal("play").then(
                 argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
                     Notebot notebot = Modules.get().get(Notebot.class);
+                    if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
                     Path songPath = ctx.getArgument("song", Path.class);
                     if (songPath == null || !songPath.toFile().exists()) {
                         throw INVALID_SONG.create();
@@ -99,6 +105,7 @@ public class NotebotCommand extends Command {
             literal("preview").then(
                 argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
                     Notebot notebot = Modules.get().get(Notebot.class);
+                    if (notebot == null) { error("Notebot module not found."); return SINGLE_SUCCESS; }
                     Path songPath = ctx.getArgument("song", Path.class);
                     if (songPath == null || !songPath.toFile().exists()) {
                         throw INVALID_SONG.create();

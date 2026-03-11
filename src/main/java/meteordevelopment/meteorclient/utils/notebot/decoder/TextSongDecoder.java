@@ -7,6 +7,7 @@ package meteordevelopment.meteorclient.utils.notebot.decoder;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import meteordevelopment.meteorclient.systems.modules.misc.Notebot;
 import meteordevelopment.meteorclient.utils.notebot.song.Note;
 import meteordevelopment.meteorclient.utils.notebot.song.Song;
 import net.minecraft.block.enums.NoteBlockInstrument;
@@ -40,7 +41,8 @@ public class TextSongDecoder extends SongDecoder {
 
             String[] parts = data.get(lineNumber).split(":");
             if (parts.length < 2) {
-                notebot.warning("Malformed line %d", lineNumber);
+                Notebot nb = getNotebot();
+                if (nb != null) nb.warning("Malformed line %d", lineNumber);
                 continue;
             }
             int key;
@@ -53,7 +55,8 @@ public class TextSongDecoder extends SongDecoder {
                     type = Integer.parseInt(parts[2]);
                 }
             } catch (NumberFormatException e) {
-                notebot.warning("Invalid character at line %d", lineNumber);
+                Notebot nb = getNotebot();
+                if (nb != null) nb.warning("Invalid character at line %d", lineNumber);
                 continue;
             }
 
