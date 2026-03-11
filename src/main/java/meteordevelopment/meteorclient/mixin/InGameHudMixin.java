@@ -49,42 +49,50 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderStatusEffectOverlay(CallbackInfo info) {
-        if (Modules.get().get(NoRender.class).noPotionIcons()) info.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noPotionIcons()) info.cancel();
     }
 
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderPortalOverlay(DrawContext context, float nauseaStrength, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noPortalOverlay()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noPortalOverlay()) ci.cancel();
     }
 
     @ModifyArgs(method = "renderMiscOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 0))
     private void onRenderPumpkinOverlay(Args args) {
-        if (Modules.get().get(NoRender.class).noPumpkinOverlay()) args.set(2, 0f);
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noPumpkinOverlay()) args.set(2, 0f);
     }
 
     @ModifyArgs(method = "renderMiscOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 1))
     private void onRenderPowderedSnowOverlay(Args args) {
-        if (Modules.get().get(NoRender.class).noPowderedSnowOverlay()) args.set(2, 0f);
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noPowderedSnowOverlay()) args.set(2, 0f);
     }
 
     @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderVignetteOverlay(DrawContext context, Entity entity, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noVignette()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noVignette()) ci.cancel();
     }
 
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At("HEAD"), cancellable = true)
     private void onRenderScoreboardSidebar(DrawContext context, ScoreboardObjective objective, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noScoreboard()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noScoreboard()) ci.cancel();
     }
 
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At("HEAD"), cancellable = true)
     private void onRenderScoreboardSidebar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noScoreboard()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noScoreboard()) ci.cancel();
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderSpyglassOverlay(DrawContext context, float scale, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noSpyglassOverlay()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noSpyglassOverlay()) ci.cancel();
     }
 
     @ModifyExpressionValue(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/Perspective;isFirstPerson()Z"))
@@ -94,28 +102,33 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     private void onRenderCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noCrosshair()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noCrosshair()) ci.cancel();
     }
 
     @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"), cancellable = true)
     private void onRenderTitle(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noTitle()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noTitle()) ci.cancel();
     }
 
     @Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
     private void onRenderHeldItemTooltip(DrawContext context, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noHeldItemName()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noHeldItemName()) ci.cancel();
     }
 
     @Inject(method = "clear", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;clear(Z)V"), cancellable = true)
     private void onClear(CallbackInfo info) {
-        if (Modules.get().get(BetterChat.class).keepHistory()) {
+        BetterChat betterChat = Modules.get().get(BetterChat.class);
+        if (betterChat != null && betterChat.keepHistory()) {
             info.cancel();
         }
     }
 
     @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderNausea(DrawContext context, float distortionStrength, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noNausea()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noNausea()) ci.cancel();
     }
 }

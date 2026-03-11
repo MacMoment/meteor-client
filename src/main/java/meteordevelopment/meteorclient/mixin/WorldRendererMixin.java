@@ -88,17 +88,17 @@ public abstract class WorldRendererMixin implements IWorldRenderer {
 
     @WrapWithCondition(method = "method_62216", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WeatherRendering;renderPrecipitation(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/client/render/state/WeatherRenderState;)V"))
     private boolean shouldRenderPrecipitation(WeatherRendering instance, VertexConsumerProvider vertexConsumers, Vec3d pos, WeatherRenderState weatherRenderState) {
-        return !noRender.noWeather();
+        return noRender == null || !noRender.noWeather();
     }
 
     @WrapWithCondition(method = "method_62216", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldBorderRendering;render(Lnet/minecraft/client/render/state/WorldBorderRenderState;Lnet/minecraft/util/math/Vec3d;DD)V"))
     private boolean shouldRenderWorldBorder(WorldBorderRendering instance, WorldBorderRenderState state, Vec3d cameraPos, double viewDistanceBlocks, double farPlaneDistance) {
-        return !noRender.noWorldBorder();
+        return noRender == null || !noRender.noWorldBorder();
     }
 
 	@Inject(method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z", at = @At("HEAD"), cancellable = true)
 	private void hasBlindnessOrDarkness(Camera camera, CallbackInfoReturnable<Boolean> info) {
-		if (noRender.noBlindness() || noRender.noDarkness()) info.setReturnValue(null);
+		if (noRender != null && (noRender.noBlindness() || noRender.noDarkness())) info.setReturnValue(null);
 	}
 
     // Entity Shaders
@@ -142,7 +142,7 @@ public abstract class WorldRendererMixin implements IWorldRenderer {
         }
 
         draw(worldState, matrices, PostProcessShaders.CHAMS, entity -> Color.WHITE);
-        draw(worldState, matrices, PostProcessShaders.ENTITY_OUTLINE, entity -> esp.getColor(entity));
+        draw(worldState, matrices, PostProcessShaders.ENTITY_OUTLINE, entity -> esp != null ? esp.getColor(entity) : null);
     }
 
     @Unique
@@ -186,7 +186,7 @@ public abstract class WorldRendererMixin implements IWorldRenderer {
 
     @ModifyExpressionValue(method = "fillEntityRenderStates", at = @At(value= "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;isRenderingReady(Lnet/minecraft/util/math/BlockPos;)Z"))
     boolean fillEntityRenderStatesIsRenderingReady(boolean original) {
-        if (esp.forceRender()) return true;
+        if (esp != null && esp.forceRender()) return true;
         return original;
     }
 
@@ -203,7 +203,7 @@ public abstract class WorldRendererMixin implements IWorldRenderer {
     @ModifyArg(method = "method_62205", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/CloudRenderer;renderClouds(ILnet/minecraft/client/option/CloudRenderMode;FLnet/minecraft/util/math/Vec3d;JF)V"))
     private int modifyColor(int original) {
         Ambience ambience = Modules.get().get(Ambience.class);
-        if (ambience.isActive() && ambience.customCloudColor.get()) {
+        if (ambience != null && ambience.isActive() && ambience.customCloudColor.get()) {
             return ambience.cloudColor.get().getPacked();
         }
 

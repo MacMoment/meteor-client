@@ -75,7 +75,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (!getEntityWorld().isClient()) return breakSpeed;
 
         SpeedMine speedMine = Modules.get().get(SpeedMine.class);
-        if (!speedMine.isActive() || speedMine.mode.get() != SpeedMine.Mode.Normal || !speedMine.filter(block.getBlock())) return breakSpeed;
+        if (speedMine == null || !speedMine.isActive() || speedMine.mode.get() != SpeedMine.Mode.Normal || !speedMine.filter(block.getBlock())) return breakSpeed;
 
         float breakSpeedMod = (float) (breakSpeed * speedMine.modifier.get());
 
@@ -94,7 +94,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @ModifyReturnValue(method = "getMovementSpeed", at = @At("RETURN"))
     private float onGetMovementSpeed(float original) {
         if (!getEntityWorld().isClient()) return original;
-        if (!Modules.get().get(NoSlow.class).slowness()) return original;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow == null || !noSlow.slowness()) return original;
 
         float walkSpeed = getAbilities().getWalkSpeed();
 
@@ -110,27 +111,35 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     private void onGetOffGroundSpeed(CallbackInfoReturnable<Float> info) {
         if (!getEntityWorld().isClient()) return;
 
-        float speed = Modules.get().get(Flight.class).getOffGroundSpeed();
+        Flight flight = Modules.get().get(Flight.class);
+        if (flight == null) return;
+        float speed = flight.getOffGroundSpeed();
         if (speed != -1) info.setReturnValue(speed);
     }
 
     @WrapWithCondition(method = "knockbackTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
     private boolean keepSprint$setVelocity(PlayerEntity instance, Vec3d vec3d) {
-        return Modules.get().get(Sprint.class).stopSprinting();
+        Sprint sprint = Modules.get().get(Sprint.class);
+        return sprint == null || sprint.stopSprinting();
     }
 
     @WrapWithCondition(method = "knockbackTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
     private boolean keepSprint$setSprinting(PlayerEntity instance, boolean b) {
-        return Modules.get().get(Sprint.class).stopSprinting();
+        Sprint sprint = Modules.get().get(Sprint.class);
+        return sprint == null || sprint.stopSprinting();
     }
 
     @ModifyReturnValue(method = "getBlockInteractionRange", at = @At("RETURN"))
     private double modifyBlockInteractionRange(double original) {
-        return Math.max(0, original + Modules.get().get(Reach.class).blockReach());
+        Reach reach = Modules.get().get(Reach.class);
+        if (reach == null) return original;
+        return Math.max(0, original + reach.blockReach());
     }
 
     @ModifyReturnValue(method = "getEntityInteractionRange", at = @At("RETURN"))
     private double modifyEntityInteractionRange(double original) {
-        return Math.max(0, original + Modules.get().get(Reach.class).entityReach());
+        Reach reach = Modules.get().get(Reach.class);
+        if (reach == null) return original;
+        return Math.max(0, original + reach.entityReach());
     }
 }

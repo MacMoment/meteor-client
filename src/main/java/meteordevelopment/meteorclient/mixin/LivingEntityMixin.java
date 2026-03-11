@@ -55,14 +55,15 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "spawnItemParticles", at = @At("HEAD"), cancellable = true)
     private void spawnItemParticles(ItemStack stack, int count, CallbackInfo info) {
         NoRender noRender = Modules.get().get(NoRender.class);
-        if (noRender.noEatParticles() && stack.getComponents().contains(DataComponentTypes.FOOD)) info.cancel();
+        if (noRender != null && noRender.noEatParticles() && stack.getComponents().contains(DataComponentTypes.FOOD)) info.cancel();
     }
 
     @Inject(method = "onEquipStack", at = @At("HEAD"), cancellable = true)
     private void onEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack newStack, CallbackInfo info) {
         if ((Object) this != mc.player) return;
 
-        if (Modules.get().get(OffhandCrash.class).isAntiCrash()) {
+        OffhandCrash offhandCrash = Modules.get().get(OffhandCrash.class);
+        if (offhandCrash != null && offhandCrash.isAntiCrash()) {
             info.cancel();
         }
     }
@@ -72,7 +73,7 @@ public abstract class LivingEntityMixin extends Entity {
         if ((Object) this != mc.player) return hand;
 
         HandView handView = Modules.get().get(HandView.class);
-        if (handView.isActive()) {
+        if (handView != null && handView.isActive()) {
             if (handView.swingMode.get() == HandView.SwingMode.None) return hand;
             return handView.swingMode.get() == HandView.SwingMode.Offhand ? Hand.OFF_HAND : Hand.MAIN_HAND;
         }
@@ -83,14 +84,16 @@ public abstract class LivingEntityMixin extends Entity {
     private int getHandSwingDuration(int original) {
         if ((Object) this != mc.player) return original;
 
-        return Modules.get().get(HandView.class).isActive() && mc.options.getPerspective().isFirstPerson() ? Modules.get().get(HandView.class).swingSpeed.get() : original;
+        HandView handView = Modules.get().get(HandView.class);
+        return handView != null && handView.isActive() && mc.options.getPerspective().isFirstPerson() ? handView.swingSpeed.get() : original;
     }
 
     @ModifyReturnValue(method = "isGliding", at = @At("RETURN"))
     private boolean isGlidingHook(boolean original) {
         if ((Object) this != mc.player) return original;
 
-        if (Modules.get().get(ElytraFly.class).canPacketEfly()) {
+        ElytraFly elytraFly = Modules.get().get(ElytraFly.class);
+        if (elytraFly != null && elytraFly.canPacketEfly()) {
             return true;
         }
 
@@ -104,7 +107,7 @@ public abstract class LivingEntityMixin extends Entity {
     public void recastOnLand(CallbackInfoReturnable<Boolean> cir) {
         boolean elytra = cir.getReturnValue();
         ElytraFly elytraFly = Modules.get().get(ElytraFly.class);
-        if (previousElytra && !elytra && elytraFly.isActive() && elytraFly.flightMode.get() == ElytraFlightModes.Bounce) {
+        if (elytraFly != null && previousElytra && !elytra && elytraFly.isActive() && elytraFly.flightMode.get() == ElytraFlightModes.Bounce) {
             cir.setReturnValue(Bounce.recastElytra(mc.player));
         }
         previousElytra = elytra;
@@ -113,7 +116,8 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     private boolean hasStatusEffect(boolean original, RegistryEntry<StatusEffect> effect) {
         if (effect == null || effect.value() == null) return original;
-        if (Modules.get().get(NoStatusEffects.class).shouldBlock(effect.value())) return false;
+        NoStatusEffects noStatusEffects = Modules.get().get(NoStatusEffects.class);
+        if (noStatusEffects != null && noStatusEffects.shouldBlock(effect.value())) return false;
 
         return original;
     }
@@ -121,7 +125,8 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float modifyGetYaw(float original) {
         if ((Object) this != mc.player) return original;
-        if (!Modules.get().get(Sprint.class).rageSprint()) return original;
+        Sprint sprint = Modules.get().get(Sprint.class);
+        if (sprint == null || !sprint.rageSprint()) return original;
 
         float forward = Math.signum(mc.player.forwardSpeed);
         float strafe = 90 * Math.signum(mc.player.sidewaysSpeed);
@@ -143,7 +148,8 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean modifyIsSprinting(boolean original) {
         if ((Object) this != mc.player) return original;
-        if (!Modules.get().get(Sprint.class).rageSprint()) return original;
+        Sprint sprint = Modules.get().get(Sprint.class);
+        if (sprint == null || !sprint.rageSprint()) return original;
 
         // only add the extra velocity if you're actually moving, otherwise you'll jump in place and move forward
         return original && (Math.abs(mc.player.forwardSpeed) > 1.0E-5F || Math.abs(mc.player.sidewaysSpeed) > 1.0E-5F);

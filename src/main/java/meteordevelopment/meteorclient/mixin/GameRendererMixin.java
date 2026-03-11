@@ -180,14 +180,16 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "showFloatingItem", at = @At("HEAD"), cancellable = true)
     private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
-        if (floatingItem.getItem() == Items.TOTEM_OF_UNDYING && Modules.get().get(NoRender.class).noTotemAnimation()) {
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender != null && noRender.noTotemAnimation()) {
             info.cancel();
         }
     }
 
     @ModifyExpressionValue(method = "renderWorld", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 0))
     private float applyCameraTransformationsMathHelperLerpProxy(float original) {
-        return Modules.get().get(NoRender.class).noNausea() ? 0 : original;
+        NoRender noRender = Modules.get().get(NoRender.class);
+        return noRender != null && noRender.noNausea() ? 0 : original;
     }
 
     @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
@@ -203,9 +205,10 @@ public abstract class GameRendererMixin {
     @Inject(method = "updateCrosshairTarget", at = @At("HEAD"), cancellable = true)
     private void updateTargetedEntityInvoke(float tickDelta, CallbackInfo info) {
         Freecam freecam = Modules.get().get(Freecam.class);
+        boolean freecamActive = freecam != null && freecam.isActive();
         boolean highwayBuilder = Modules.get().isActive(HighwayBuilder.class);
 
-        if ((freecam.isActive() || highwayBuilder) && client.getCameraEntity() != null && !freecamSet) {
+        if ((freecamActive || highwayBuilder) && client.getCameraEntity() != null && !freecamSet) {
             info.cancel();
             Entity cameraE = client.getCameraEntity();
 
@@ -251,8 +254,10 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
     private void renderHand(float tickProgress, boolean sleeping, Matrix4f positionMatrix, CallbackInfo ci) {
-        if (!Modules.get().get(Freecam.class).renderHands() ||
-            !Modules.get().get(Zoom.class).renderHands())
+        Freecam freecam = Modules.get().get(Freecam.class);
+        Zoom zoom = Modules.get().get(Zoom.class);
+        if ((freecam != null && !freecam.renderHands()) ||
+            (zoom != null && !zoom.renderHands()))
             ci.cancel();
     }
 }

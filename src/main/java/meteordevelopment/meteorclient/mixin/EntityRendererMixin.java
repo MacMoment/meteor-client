@@ -48,41 +48,45 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 
     @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
     private void onRenderLabel(T entity, CallbackInfoReturnable<Text> cir) {
-        if (noRender.noNametags()) cir.setReturnValue(null);
+        if (noRender != null && noRender.noNametags()) cir.setReturnValue(null);
         if (!(entity instanceof PlayerEntity player)) return;
-        if (Modules.get().get(Nametags.class).playerNametags() && !(EntityUtils.getGameMode(player) == null && Modules.get().get(Nametags.class).excludeBots()))
+        Nametags nametags = Modules.get().get(Nametags.class);
+        if (nametags != null && nametags.playerNametags() && !(EntityUtils.getGameMode(player) == null && nametags.excludeBots()))
             cir.setReturnValue(null);
     }
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(T entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
-        if (noRender.noEntity(entity)) cir.setReturnValue(false);
-        if (noRender.noFallingBlocks() && entity instanceof FallingBlockEntity) cir.setReturnValue(false);
+        if (noRender != null && noRender.noEntity(entity)) cir.setReturnValue(false);
+        if (noRender != null && noRender.noFallingBlocks() && entity instanceof FallingBlockEntity) cir.setReturnValue(false);
     }
 
     @Inject(method = "canBeCulled", at = @At("HEAD"), cancellable = true)
     void canBeCulled(T entity, CallbackInfoReturnable<Boolean> cir) {
-        if (esp.forceRender()) cir.setReturnValue(false);
+        if (esp != null && esp.forceRender()) cir.setReturnValue(false);
     }
 
     @ModifyReturnValue(method = "getSkyLight", at = @At("RETURN"))
     private int onGetSkyLight(int original) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.SKY), original);
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        return fullbright != null ? Math.max(fullbright.getLuminance(LightType.SKY), original) : original;
     }
 
     @ModifyReturnValue(method = "getBlockLight", at = @At("RETURN"))
     private int onGetBlockLight(int original) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.BLOCK), original);
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        return fullbright != null ? Math.max(fullbright.getLuminance(LightType.BLOCK), original) : original;
     }
 
     @ModifyExpressionValue(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getLightLevel(Lnet/minecraft/world/LightType;Lnet/minecraft/util/math/BlockPos;)I"))
     private int onGetLightLevel(int original) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.BLOCK), original);
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        return fullbright != null ? Math.max(fullbright.getLuminance(LightType.BLOCK), original) : original;
     }
 
     @Inject(method = "updateRenderState", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/entity/state/EntityRenderState;outlineColor:I", shift = At.Shift.AFTER, opcode = Opcodes.PUTFIELD))
     private void onGetOutlineColor(T entity, S state, float tickProgress, CallbackInfo ci) {
-        if (esp.isGlow() && !esp.shouldSkip(entity)) {
+        if (esp != null && esp.isGlow() && !esp.shouldSkip(entity)) {
             Color color = esp.getColor(entity);
 
             if (color == null) return;
@@ -92,7 +96,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 
     @Inject(method = "updateShadow(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;)V", at = @At("HEAD"), cancellable = true)
     private void updateShadow(Entity entity, EntityRenderState renderState, CallbackInfo ci) {
-        if (noRender.noDeadEntities() &&
+        if (noRender != null && noRender.noDeadEntities() &&
             entity instanceof LivingEntity &&
             renderState instanceof LivingEntityRenderState livingEntityRenderState &&
             livingEntityRenderState.deathTime > 0) {
