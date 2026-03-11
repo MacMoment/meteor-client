@@ -25,6 +25,7 @@ import meteordevelopment.meteorclient.mixininterface.IMinecraftClient;
 import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.InventoryTweaks;
+import meteordevelopment.meteorclient.systems.modules.misc.UnfocusedFPS;
 import meteordevelopment.meteorclient.systems.modules.movement.GUIMove;
 import meteordevelopment.meteorclient.systems.modules.player.FastUse;
 import meteordevelopment.meteorclient.systems.modules.player.Multitask;
@@ -311,6 +312,16 @@ public abstract class MinecraftClientMixin implements IMinecraftClient {
 
         handleBlockBreaking(isBreaking);
         isBreaking = false;
+    }
+
+    // Unfocused FPS
+
+    @ModifyReturnValue(method = "getFramerateLimit", at = @At("RETURN"))
+    private int modifyFramerateLimit(int original) {
+        if (((MinecraftClient) (Object) this).isWindowFocused()) return original;
+        UnfocusedFPS unfocusedFPS = Modules.get().get(UnfocusedFPS.class);
+        if (unfocusedFPS != null && unfocusedFPS.isActive()) return unfocusedFPS.fps.get();
+        return original;
     }
 
     // Interface
