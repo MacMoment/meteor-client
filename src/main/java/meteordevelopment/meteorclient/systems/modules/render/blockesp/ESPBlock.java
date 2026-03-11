@@ -59,6 +59,7 @@ public class ESPBlock {
     }
 
     public ESPBlock getSideBlock(int side) {
+        if (blockEsp == null) return null;
         return switch (side) {
             case FO -> blockEsp.getBlock(x, y, z + 1);
             case BA -> blockEsp.getBlock(x, y, z - 1);
@@ -88,6 +89,7 @@ public class ESPBlock {
         }
 
         if (firstGroup == null) {
+            if (blockEsp == null) return;
             firstGroup = blockEsp.newGroup(state.getBlock());
         }
 
@@ -169,6 +171,8 @@ public class ESPBlock {
     }
 
     public void render(Render3DEvent event) {
+        if (blockEsp == null) return;
+
         double x1 = x;
         double y1 = y;
         double z1 = z;

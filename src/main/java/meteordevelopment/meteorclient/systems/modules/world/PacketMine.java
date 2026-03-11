@@ -193,8 +193,9 @@ public class PacketMine extends Module {
     private void onRender(Render3DEvent event) {
         if (!render.get()) return;
 
+        BreakIndicators breakIndicators = Modules.get().get(BreakIndicators.class);
         for (MyBlock block : blocks) {
-            if (!Modules.get().get(BreakIndicators.class).isActive() || !Modules.get().get(BreakIndicators.class).packetMine.get() || !block.mining) {
+            if (breakIndicators == null || !breakIndicators.isActive() || !breakIndicators.packetMine.get() || !block.mining) {
                 block.render(event);
             }
         }

@@ -49,7 +49,9 @@ public class ESPGroup {
         sumY -= block.y;
         sumZ -= block.z;
 
-        if (blocks.isEmpty()) blockEsp.removeGroup(block.group);
+        if (blocks.isEmpty()) {
+            if (blockEsp != null) blockEsp.removeGroup(block.group);
+        }
         else if (splitGroup) {
             trySplit(block);
         }
@@ -97,6 +99,7 @@ public class ESPGroup {
         }
 
         if (!neighbours.isEmpty()) {
+            if (blockEsp == null) return;
             ESPGroup group = blockEsp.newGroup(this.block);
             group.blocks.ensureCapacity(remainingBlocks.size());
 
@@ -135,10 +138,11 @@ public class ESPGroup {
     public void merge(ESPGroup group) {
         blocks.ensureCapacity(blocks.size() + group.blocks.size());
         for (ESPBlock block : group.blocks) add(block, false, false);
-        blockEsp.removeGroup(group);
+        if (blockEsp != null) blockEsp.removeGroup(group);
     }
 
     public void render(Render3DEvent event) {
+        if (blockEsp == null) return;
         ESPBlockData blockData = blockEsp.getBlockData(block);
 
         if (blockData.tracer) {
