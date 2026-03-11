@@ -136,7 +136,8 @@ public class AutoEat extends Module {
     @EventHandler(priority = EventPriority.LOW)
     private void onTick(TickEvent.Pre event) {
         // Don't eat if AutoGap is already eating
-        if (Modules.get().get(AutoGap.class).isEating()) return;
+        AutoGap autoGap = Modules.get().get(AutoGap.class);
+        if (autoGap != null && autoGap.isEating()) return;
 
         // case 1: Already eating
         if (eating) {
@@ -217,7 +218,8 @@ public class AutoEat extends Module {
         if (pauseAuras.get()) {
             for (Class<? extends Module> klass : AURAS) {
                 if (wasAura.contains(klass)) {
-                    Modules.get().get(klass).enable();
+                    Module module = Modules.get().get(klass);
+                    if (module != null) module.enable();
                 }
             }
         }

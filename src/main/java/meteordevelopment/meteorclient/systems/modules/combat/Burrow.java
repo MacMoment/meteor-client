@@ -142,7 +142,8 @@ public class Burrow extends Module {
 
         blockPos.set(mc.player.getBlockPos());
 
-        Modules.get().get(Timer.class).setOverride(this.timer.get());
+        Timer timerModule = Modules.get().get(Timer.class);
+        if (timerModule != null) timerModule.setOverride(this.timer.get());
 
         shouldBurrow = false;
 
@@ -156,7 +157,8 @@ public class Burrow extends Module {
 
     @Override
     public void onDeactivate() {
-        Modules.get().get(Timer.class).setOverride(Timer.OFF);
+        Timer timerModule = Modules.get().get(Timer.class);
+        if (timerModule != null) timerModule.setOverride(Timer.OFF);
     }
 
     @EventHandler
