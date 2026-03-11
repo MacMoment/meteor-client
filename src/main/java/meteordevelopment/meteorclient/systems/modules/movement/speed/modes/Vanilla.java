@@ -33,7 +33,7 @@ public class Vanilla extends SpeedMode {
         }
 
         Anchor anchor = Modules.get().get(Anchor.class);
-        if (anchor.isActive() && anchor.controlMovement) {
+        if (anchor != null && anchor.isActive() && anchor.controlMovement) {
             velX = anchor.deltaX;
             velZ = anchor.deltaZ;
         }

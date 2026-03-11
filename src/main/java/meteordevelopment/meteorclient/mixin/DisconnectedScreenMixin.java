@@ -30,7 +30,13 @@ public abstract class DisconnectedScreenMixin extends Screen {
     @Final
     private DirectionalLayoutWidget grid;
     @Unique private ButtonWidget reconnectBtn;
-    @Unique private double time = Modules.get().get(AutoReconnect.class).time.get() * 20;
+    @Unique private double time = getAutoReconnectTime();
+
+    @Unique
+    private static double getAutoReconnectTime() {
+        AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
+        return autoReconnect != null ? autoReconnect.time.get() * 20 : 0;
+    }
 
     protected DisconnectedScreenMixin(Text title) {
         super(title);
@@ -40,7 +46,7 @@ public abstract class DisconnectedScreenMixin extends Screen {
     private void addButtons(CallbackInfo ci) {
         AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
 
-        if (autoReconnect.lastServerConnection != null && !autoReconnect.button.get()) {
+        if (autoReconnect != null && autoReconnect.lastServerConnection != null && !autoReconnect.button.get()) {
             reconnectBtn = new ButtonWidget.Builder(Text.literal(getText()), button -> tryConnecting()).build();
             grid.add(reconnectBtn);
 
@@ -57,7 +63,7 @@ public abstract class DisconnectedScreenMixin extends Screen {
     @Override
     public void tick() {
         AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
-        if (!autoReconnect.isActive() || autoReconnect.lastServerConnection == null) return;
+        if (autoReconnect == null || !autoReconnect.isActive() || autoReconnect.lastServerConnection == null) return;
 
         if (time <= 0) {
             tryConnecting();
@@ -76,7 +82,9 @@ public abstract class DisconnectedScreenMixin extends Screen {
 
     @Unique
     private void tryConnecting() {
-        var lastServer = Modules.get().get(AutoReconnect.class).lastServerConnection;
+        AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
+        if (autoReconnect == null) return;
+        var lastServer = autoReconnect.lastServerConnection;
         ConnectScreen.connect(new TitleScreen(), mc, lastServer.left(), lastServer.right(), false, null);
     }
 }

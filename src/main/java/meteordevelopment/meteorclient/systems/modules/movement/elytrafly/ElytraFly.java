@@ -377,7 +377,8 @@ public class ElytraFly extends Module {
         currentMode.onActivate();
         if ((chestSwap.get() == ChestSwapMode.Always || chestSwap.get() == ChestSwapMode.WaitForGround)
             && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA && isActive()) {
-            Modules.get().get(ChestSwap.class).swap();
+            ChestSwap chestSwapModule = Modules.get().get(ChestSwap.class);
+            if (chestSwapModule != null) chestSwapModule.swap();
         }
     }
 
@@ -386,7 +387,8 @@ public class ElytraFly extends Module {
         if (autoPilot.get()) mc.options.forwardKey.setPressed(false);
 
         if (chestSwap.get() == ChestSwapMode.Always && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
-            Modules.get().get(ChestSwap.class).swap();
+            ChestSwap chestSwapModule = Modules.get().get(ChestSwap.class);
+            if (chestSwapModule != null) chestSwapModule.swap();
         } else if (chestSwap.get() == ChestSwapMode.WaitForGround) {
             enableGroundListener();
         }
@@ -455,7 +457,8 @@ public class ElytraFly extends Module {
             }
         }
 
-        if (autoHover.get() && mc.player.input.playerInput.sneak() && !Modules.get().get(Freecam.class).isActive() && mc.player.isGliding() && flightMode.get() != ElytraFlightModes.Bounce) {
+        Freecam freecam = Modules.get().get(Freecam.class);
+        if (autoHover.get() && mc.player.input.playerInput.sneak() && (freecam == null || !freecam.isActive()) && mc.player.isGliding() && flightMode.get() != ElytraFlightModes.Bounce) {
             BlockState underState = mc.world.getBlockState(mc.player.getBlockPos().down());
             Block under = underState.getBlock();
             BlockState under2State = mc.world.getBlockState(mc.player.getBlockPos().down().down());
@@ -527,7 +530,8 @@ public class ElytraFly extends Module {
         private void chestSwapGroundListener(PlayerMoveEvent event) {
             if (mc.player != null && mc.player.isOnGround()) {
                 if (mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
-                    Modules.get().get(ChestSwap.class).swap();
+                    ChestSwap chestSwapModule = Modules.get().get(ChestSwap.class);
+                    if (chestSwapModule != null) chestSwapModule.swap();
                     disableGroundListener();
                 }
             }

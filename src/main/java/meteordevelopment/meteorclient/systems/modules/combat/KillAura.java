@@ -301,7 +301,8 @@ public class KillAura extends Module {
             stopAttacking();
             return;
         }
-        if (pauseOnCA.get() && Modules.get().get(CrystalAura.class).isActive() && Modules.get().get(CrystalAura.class).kaTimer > 0) {
+        CrystalAura crystalAura = Modules.get().get(CrystalAura.class);
+        if (pauseOnCA.get() && crystalAura != null && crystalAura.isActive() && crystalAura.kaTimer > 0) {
             stopAttacking();
             return;
         }

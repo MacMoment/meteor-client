@@ -110,7 +110,7 @@ public class Utils {
         double tZ = mc.player.getZ() - mc.player.lastZ;
 
         Timer timer = Modules.get().get(Timer.class);
-        if (timer.isActive()) {
+        if (timer != null && timer.isActive()) {
             tX *= timer.getMultiplier();
             tY *= timer.getMultiplier();
             tZ *= timer.getMultiplier();

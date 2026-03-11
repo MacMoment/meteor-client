@@ -45,7 +45,8 @@ public class WBlockPosEdit extends WHorizontalList {
             WButton click = add(theme.button("Click")).expandX().widget();
             click.action = () -> {
                 String sb = "Click!\nRight click to pick a new position.\nLeft click to cancel.";
-                Modules.get().get(Marker.class).info(sb);
+                Marker marker = Modules.get().get(Marker.class);
+                if (marker != null) marker.info(sb);
 
                 clicking = true;
                 MeteorClient.EVENT_BUS.subscribe(this);

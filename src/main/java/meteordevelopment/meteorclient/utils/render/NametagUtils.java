@@ -51,7 +51,7 @@ public class NametagUtils {
 
     public static boolean to2D(Vector3d pos, double scale, boolean distanceScaling, boolean allowBehind) {
         Zoom zoom = Modules.get().get(Zoom.class);
-        NametagUtils.scale = scale * zoom.getScaling();
+        NametagUtils.scale = scale * (zoom != null ? zoom.getScaling() : 1.0);
         if (distanceScaling) {
             NametagUtils.scale *= getScale(pos);
         }

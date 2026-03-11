@@ -97,7 +97,10 @@ public class MeteorClient implements ClientModInitializer {
         if (!FOLDER.exists()) {
             FOLDER.getParentFile().mkdirs();
             FOLDER.mkdir();
-            Systems.addPreLoadTask(() -> Modules.get().get(DiscordPresence.class).enable());
+            Systems.addPreLoadTask(() -> {
+                DiscordPresence dp = Modules.get().get(DiscordPresence.class);
+                if (dp != null) dp.enable();
+            });
         }
 
         // Register addons

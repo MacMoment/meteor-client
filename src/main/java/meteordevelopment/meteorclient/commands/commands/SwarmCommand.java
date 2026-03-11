@@ -212,8 +212,11 @@ public class SwarmCommand extends Command {
                     swarm.host.sendMessage(context.getInput());
                 }
                 else if (swarm.isWorker()) {
-                    Modules.get().get(InfinityMiner.class).targetBlocks.set(List.of(context.getArgument("target", BlockStateArgument.class).getBlockState().getBlock()));
-                    runInfinityMiner();
+                    InfinityMiner infinityMiner = Modules.get().get(InfinityMiner.class);
+                    if (infinityMiner != null) {
+                        infinityMiner.targetBlocks.set(List.of(context.getArgument("target", BlockStateArgument.class).getBlockState().getBlock()));
+                        runInfinityMiner();
+                    }
                 }
             }
             else {
@@ -228,9 +231,12 @@ public class SwarmCommand extends Command {
                     swarm.host.sendMessage(context.getInput());
                 }
                 else if (swarm.isWorker()) {
-                    Modules.get().get(InfinityMiner.class).targetBlocks.set(List.of(context.getArgument("target", BlockStateArgument.class).getBlockState().getBlock()));
-                    Modules.get().get(InfinityMiner.class).repairBlocks.set(List.of(context.getArgument("repair", BlockStateArgument.class).getBlockState().getBlock()));
-                    runInfinityMiner();
+                    InfinityMiner infinityMiner = Modules.get().get(InfinityMiner.class);
+                    if (infinityMiner != null) {
+                        infinityMiner.targetBlocks.set(List.of(context.getArgument("target", BlockStateArgument.class).getBlockState().getBlock()));
+                        infinityMiner.repairBlocks.set(List.of(context.getArgument("repair", BlockStateArgument.class).getBlockState().getBlock()));
+                        runInfinityMiner();
+                    }
                 }
             }
             else {
@@ -245,7 +251,8 @@ public class SwarmCommand extends Command {
                     swarm.host.sendMessage(context.getInput());
                 }
                 else if (swarm.isWorker()) {
-                    Modules.get().get(InfinityMiner.class).logOut.set(BoolArgumentType.getBool(context, "logout"));
+                    InfinityMiner infinityMiner = Modules.get().get(InfinityMiner.class);
+                    if (infinityMiner != null) infinityMiner.logOut.set(BoolArgumentType.getBool(context, "logout"));
                 }
             }
             else {
@@ -259,7 +266,8 @@ public class SwarmCommand extends Command {
                 if (swarm.isHost()) {
                     swarm.host.sendMessage(context.getInput());
                 } else if (swarm.isWorker()) {
-                    Modules.get().get(InfinityMiner.class).walkHome.set(BoolArgumentType.getBool(context, "walkhome"));
+                    InfinityMiner infinityMiner = Modules.get().get(InfinityMiner.class);
+                    if (infinityMiner != null) infinityMiner.walkHome.set(BoolArgumentType.getBool(context, "walkhome"));
                 }
             } else {
                 throw SWARM_NOT_ACTIVE.create();
@@ -388,6 +396,7 @@ public class SwarmCommand extends Command {
 
     private void runInfinityMiner() {
         InfinityMiner infinityMiner = Modules.get().get(InfinityMiner.class);
+        if (infinityMiner == null) return;
         infinityMiner.disable();
 //        infinityMiner.smartModuleToggle.set(true);
         infinityMiner.enable();

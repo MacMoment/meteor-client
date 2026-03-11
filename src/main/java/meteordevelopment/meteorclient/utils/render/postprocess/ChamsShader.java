@@ -102,7 +102,7 @@ public class ChamsShader extends EntityShader {
     @Override
     protected boolean shouldDraw() {
         if (chams == null) chams = Modules.get().get(Chams.class);
-        return chams.isShader();
+        return chams != null && chams.isShader();
     }
 
     @Override

@@ -131,7 +131,8 @@ public class LongJump extends Module {
 
     @Override
     public void onDeactivate() {
-        Modules.get().get(Timer.class).setOverride(Timer.OFF);
+        Timer timerModule = Modules.get().get(Timer.class);
+        if (timerModule != null) timerModule.setOverride(Timer.OFF);
     }
 
     @EventHandler
@@ -145,7 +146,8 @@ public class LongJump extends Module {
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
         if (timer.get() != Timer.OFF) {
-            Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
+            Timer timerModule = Modules.get().get(Timer.class);
+            if (timerModule != null) timerModule.setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
         }
         switch (jumpMode.get()) {
             case Vanilla -> {

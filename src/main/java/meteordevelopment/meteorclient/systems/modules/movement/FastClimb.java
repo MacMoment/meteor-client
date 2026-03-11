@@ -65,9 +65,11 @@ public class FastClimb extends Module {
         if (timerMode.get()) {
             if (climbing()) {
                 resetTimer = false;
-                Modules.get().get(Timer.class).setOverride(timer.get());
+                Timer timerModule = Modules.get().get(Timer.class);
+                if (timerModule != null) timerModule.setOverride(timer.get());
             } else if (!resetTimer) {
-                Modules.get().get(Timer.class).setOverride(Timer.OFF);
+                Timer timerModule = Modules.get().get(Timer.class);
+                if (timerModule != null) timerModule.setOverride(Timer.OFF);
                 resetTimer = true;
             }
         }

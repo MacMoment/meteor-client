@@ -34,7 +34,8 @@ import static net.minecraft.client.util.InputUtil.*;
 public abstract class ScreenMixin {
     @Inject(method = "renderInGameBackground", at = @At("HEAD"), cancellable = true)
     private void onRenderInGameBackground(CallbackInfo info) {
-        if (Utils.canUpdate() && Modules.get().get(NoRender.class).noGuiBackground())
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (Utils.canUpdate() && noRender != null && noRender.noGuiBackground())
             info.cancel();
     }
 

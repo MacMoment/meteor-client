@@ -237,7 +237,8 @@ public class AutoGap extends Module {
         if (pauseAuras.get()) {
             for (Class<? extends Module> klass : AURAS) {
                 if (wasAura.contains(klass)) {
-                    Modules.get().get(klass).enable();
+                    Module module = Modules.get().get(klass);
+                    if (module != null) module.enable();
                 }
             }
         }

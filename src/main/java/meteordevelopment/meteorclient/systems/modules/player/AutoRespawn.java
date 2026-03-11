@@ -23,7 +23,8 @@ public class AutoRespawn extends Module {
     private void onOpenScreenEvent(OpenScreenEvent event) {
         if (!(event.screen instanceof DeathScreen)) return;
 
-        Modules.get().get(WaypointsModule.class).addDeath(mc.player.getEntityPos());
+        WaypointsModule waypointsModule = Modules.get().get(WaypointsModule.class);
+        if (waypointsModule != null) waypointsModule.addDeath(mc.player.getEntityPos());
         mc.player.requestRespawn();
         event.cancel();
     }

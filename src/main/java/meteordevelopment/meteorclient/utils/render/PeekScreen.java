@@ -35,6 +35,7 @@ public class PeekScreen extends ShulkerBoxScreen {
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
+        if (tooltips == null) return false;
 
         if (tooltips.shouldOpenContents(click) && focusedSlot != null && !focusedSlot.getStack().isEmpty() && mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
             ItemStack itemStack = focusedSlot.getStack();
@@ -53,7 +54,7 @@ public class PeekScreen extends ShulkerBoxScreen {
     public boolean keyPressed(KeyInput input) {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
 
-        if (tooltips.shouldOpenContents(input) && focusedSlot != null && !focusedSlot.getStack().isEmpty() && mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
+        if (tooltips != null && tooltips.shouldOpenContents(input) && focusedSlot != null && !focusedSlot.getStack().isEmpty() && mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
             ItemStack itemStack = focusedSlot.getStack();
             if (tooltips.openContent(itemStack)) {
                 return true;

@@ -500,10 +500,14 @@ public class HighwayBuilder extends Module {
         if (blocksPerTick.get() > 1 && rotation.get().mine) warning("With rotations enabled, you can break at most 1 block per tick.");
         if (placementsPerTick.get() > 1 && rotation.get().place) warning("With rotations enabled, you can place at most 1 block per tick.");
 
-        if (Modules.get().get(InstantRebreak.class).isActive()) warning("It's recommended to disable the Instant Rebreak module and instead use the 'instantly-rebreak-echests' setting to avoid errors.");
-        if (Modules.get().get(Speed.class).isActive() && dir.diagonal) warning("It's recommended to disable the Speed module to avoid misalignment on diagonals.");
-        if (!Modules.get().get(Velocity.class).isActive()) warning("It's recommended to enable the Velocity module to avoid misalignment (entity pushing, liquid movement).");
-        if (!warned && Modules.get().get(NoGhostBlocks.class).isActive()) {
+        InstantRebreak instantRebreak = Modules.get().get(InstantRebreak.class);
+        if (instantRebreak != null && instantRebreak.isActive()) warning("It's recommended to disable the Instant Rebreak module and instead use the 'instantly-rebreak-echests' setting to avoid errors.");
+        Speed speed = Modules.get().get(Speed.class);
+        if (speed != null && speed.isActive() && dir.diagonal) warning("It's recommended to disable the Speed module to avoid misalignment on diagonals.");
+        Velocity velocity = Modules.get().get(Velocity.class);
+        if (velocity != null && !velocity.isActive()) warning("It's recommended to enable the Velocity module to avoid misalignment (entity pushing, liquid movement).");
+        NoGhostBlocks noGhostBlocks = Modules.get().get(NoGhostBlocks.class);
+        if (!warned && noGhostBlocks != null && noGhostBlocks.isActive()) {
             info("The No Ghost Blocks module is useful to prevent desyncs on laggy servers. However, it will also slow Highway Builder down, and comes with the risks of incorrect statistics and packet kicks.");
             warned = true;
         }
@@ -561,7 +565,10 @@ public class HighwayBuilder extends Module {
             return;
         }
 
-        if (Modules.get().get(AutoEat.class).eating || Modules.get().get(AutoGap.class).isEating() || Modules.get().get(KillAura.class).attacking) {
+        AutoEat autoEat = Modules.get().get(AutoEat.class);
+        AutoGap autoGap = Modules.get().get(AutoGap.class);
+        KillAura killAura = Modules.get().get(KillAura.class);
+        if ((autoEat != null && autoEat.eating) || (autoGap != null && autoGap.isEating()) || (killAura != null && killAura.attacking)) {
             input.stop();
             return;
         }
@@ -1145,6 +1152,7 @@ public class HighwayBuilder extends Module {
                     if (b.ejectUselessShulkers.get() && Utils.isShulker(itemStack.getItem())) {
                         Utils.getItemsInContainerItem(itemStack, ITEMS);
                         boolean eject = true;
+                        AutoEat autoEat = Modules.get().get(AutoEat.class);
                         for (ItemStack stack : ITEMS) {
                             if (stack.getItem() instanceof BlockItem bi && (b.blocksToPlace.get().contains(bi.getBlock()) || (b.blocksToPlace.get().contains(Blocks.OBSIDIAN) && bi == Items.ENDER_CHEST))) {
                                 eject = false;
@@ -1154,7 +1162,7 @@ public class HighwayBuilder extends Module {
                                 eject = false;
                                 break;
                             }
-                            if (stack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(stack.getItem())) {
+                            if (stack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(stack.getItem()))) {
                                 eject = false;
                                 break;
                             }
@@ -1410,6 +1418,7 @@ public class HighwayBuilder extends Module {
 
                     boolean stop = EChestMemory.isKnown();
                     if (EChestMemory.isKnown()) {
+                        AutoEat autoEat = Modules.get().get(AutoEat.class);
                         for (ItemStack stack : EChestMemory.ITEMS) {
                             if (b.restockTask.materials && stack.getItem() instanceof BlockItem bi) {
                                 if (b.blocksToPlace.get().contains(bi.getBlock()) || (b.blocksToPlace.get().contains(Blocks.OBSIDIAN) && bi == Items.ENDER_CHEST)) {
@@ -1421,7 +1430,7 @@ public class HighwayBuilder extends Module {
                                 stop = false;
                                 break;
                             }
-                            if (b.restockTask.food && stack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(stack.getItem())) {
+                            if (b.restockTask.food && stack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(stack.getItem()))) {
                                 stop = false;
                                 break;
                             }
@@ -1438,10 +1447,11 @@ public class HighwayBuilder extends Module {
 
                 // by this point we have searched shulkers and your ender chest, and no more items could be found to pull from
                 if (slot == -1) {
+                    AutoEat autoEat = Modules.get().get(AutoEat.class);
                     boolean restockOccurred = (
                         (b.restockTask.materials && (hasItem(b, stack -> stack.getItem() instanceof BlockItem bi && b.blocksToPlace.get().contains(bi.getBlock())) || b.blocksToPlace.get().contains(Blocks.OBSIDIAN) && countItem(b, itemStack -> itemStack.getItem() == Items.ENDER_CHEST) > b.saveEchests.get())) ||
                         (b.restockTask.pickaxes && countItem(b, itemStack -> itemStack.isIn(ItemTags.PICKAXES)) > b.savePickaxes.get()) ||
-                        (b.restockTask.food && hasItem(b, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(itemStack.getItem())))
+                        (b.restockTask.food && hasItem(b, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(itemStack.getItem()))))
                     );
 
                     if (restockOccurred) {
@@ -1516,7 +1526,8 @@ public class HighwayBuilder extends Module {
                     if (b.blocksToPlace.get().contains(Blocks.OBSIDIAN)) slotsPulled += ((countItem(b, itemStack -> itemStack.getItem() == Items.ENDER_CHEST) - b.saveEchests.get()) * 8) / 64;
                 }
                 if (b.restockTask.pickaxes) slotsPulled += countSlots(b, itemStack -> itemStack.isIn(ItemTags.PICKAXES)) - b.savePickaxes.get();
-                if (b.restockTask.food) slotsPulled += countSlots(b, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(itemStack.getItem()));
+                AutoEat autoEat = Modules.get().get(AutoEat.class);
+                if (b.restockTask.food) slotsPulled += countSlots(b, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(itemStack.getItem())));
 
 
                 // whether we have pulled the minimum amount of items we want
@@ -1632,7 +1643,8 @@ public class HighwayBuilder extends Module {
                     if (grabFromInventory(inv, itemStack -> itemStack.isIn(ItemTags.PICKAXES))) return true;
                 }
                 if (b.restockTask.food) {
-                    return grabFromInventory(inv, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(itemStack.getItem()));
+                    AutoEat autoEat = Modules.get().get(AutoEat.class);
+                    return grabFromInventory(inv, itemStack -> itemStack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(itemStack.getItem())));
                 }
 
                 return false;
@@ -1651,6 +1663,7 @@ public class HighwayBuilder extends Module {
             }
 
             private void setShulkerPredicate(HighwayBuilder b) {
+                AutoEat autoEat = Modules.get().get(AutoEat.class);
                 shulkerPredicate = itemStack -> {
                     if (!Utils.isShulker(itemStack.getItem())) return false;
                     Utils.getItemsInContainerItem(itemStack, ITEMS);
@@ -1660,7 +1673,7 @@ public class HighwayBuilder extends Module {
                             if (b.blocksToPlace.get().contains(bi.getBlock()) || (b.blocksToPlace.get().contains(Blocks.OBSIDIAN) && bi == Items.ENDER_CHEST)) return true;
                         }
                         if (b.restockTask.pickaxes && stack.isIn(ItemTags.PICKAXES)) return true;
-                        if (b.restockTask.food && stack.contains(DataComponentTypes.FOOD) && !Modules.get().get(AutoEat.class).blacklist.get().contains(stack.getItem())) return true;
+                        if (b.restockTask.food && stack.contains(DataComponentTypes.FOOD) && (autoEat == null || !autoEat.blacklist.get().contains(stack.getItem()))) return true;
                     }
 
                     return false;
@@ -1874,12 +1887,13 @@ public class HighwayBuilder extends Module {
                 ArrayDeque<BlockPos> toDoubleMine = new ArrayDeque<>();
 
                 it.save();
+                SpeedMine speedMine = Modules.get().get(SpeedMine.class);
                 it.forEach(pos -> {
                     // only want to double mine blocks that we can mine, that are not instamined, and we are not already mining
                     if (
                         BlockUtils.canBreak(pos.getBlockPos(), pos.getState())
                         && (mineBlocksToPlace || !b.blocksToPlace.get().contains(pos.getState().getBlock()))
-                        && !BlockUtils.canInstaBreak(pos.getBlockPos()) && (!Modules.get().get(SpeedMine.class).instamine() || pos.getState().calcBlockBreakingDelta(b.mc.player, b.mc.world, pos.getBlockPos()) <= 0.5)
+                        && !BlockUtils.canInstaBreak(pos.getBlockPos()) && (speedMine == null || !speedMine.instamine() || pos.getState().calcBlockBreakingDelta(b.mc.player, b.mc.world, pos.getBlockPos()) <= 0.5)
                         && (b.normalMining == null || !pos.getBlockPos().equals(b.normalMining.blockPos))
                         && (b.packetMining == null || !pos.getBlockPos().equals(b.packetMining.blockPos))
                     ) {

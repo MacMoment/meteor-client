@@ -26,12 +26,14 @@ public class FakePlayerCommand extends Command {
         builder.then(literal("add")
             .executes(context -> {
                 FakePlayer fakePlayer = Modules.get().get(FakePlayer.class);
+                if (fakePlayer == null) return SINGLE_SUCCESS;
                 FakePlayerManager.add(fakePlayer.name.get(), fakePlayer.health.get(), fakePlayer.copyInv.get());
                 return SINGLE_SUCCESS;
             })
             .then(argument("name", StringArgumentType.word())
                 .executes(context -> {
                     FakePlayer fakePlayer = Modules.get().get(FakePlayer.class);
+                    if (fakePlayer == null) return SINGLE_SUCCESS;
                     FakePlayerManager.add(StringArgumentType.getString(context, "name"), fakePlayer.health.get(), fakePlayer.copyInv.get());
                     return SINGLE_SUCCESS;
                 })

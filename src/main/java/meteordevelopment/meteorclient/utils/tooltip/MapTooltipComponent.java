@@ -30,13 +30,15 @@ public class MapTooltipComponent implements TooltipComponent, MeteorTooltipData 
 
     @Override
     public int getHeight(TextRenderer textRenderer) {
-        double scale = Modules.get().get(BetterTooltips.class).mapsScale.get();
+        BetterTooltips bt = Modules.get().get(BetterTooltips.class);
+        double scale = bt != null ? bt.mapsScale.get() : 1.0;
         return (int) ((128 + 16) * scale) + 2;
     }
 
     @Override
     public int getWidth(TextRenderer textRenderer) {
-        double scale = Modules.get().get(BetterTooltips.class).mapsScale.get();
+        BetterTooltips bt = Modules.get().get(BetterTooltips.class);
+        double scale = bt != null ? bt.mapsScale.get() : 1.0;
         return (int) ((128 + 16) * scale);
     }
 
@@ -47,7 +49,8 @@ public class MapTooltipComponent implements TooltipComponent, MeteorTooltipData 
 
     @Override
     public void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext context) {
-        var scale = Modules.get().get(BetterTooltips.class).mapsScale.get().floatValue();
+        BetterTooltips bt = Modules.get().get(BetterTooltips.class);
+        var scale = bt != null ? bt.mapsScale.get().floatValue() : 1.0f;
 
         // Background
         int size = (int) ((128 + 16) * scale);

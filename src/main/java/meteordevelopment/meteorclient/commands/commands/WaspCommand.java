@@ -24,14 +24,15 @@ public class WaspCommand extends Command {
 
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
-        AutoWasp wasp = Modules.get().get(AutoWasp.class);
-
         builder.then(literal("reset").executes(context -> {
-            wasp.disable();
+            AutoWasp wasp = Modules.get().get(AutoWasp.class);
+            if (wasp != null) wasp.disable();
             return SINGLE_SUCCESS;
         }));
 
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
+            AutoWasp wasp = Modules.get().get(AutoWasp.class);
+            if (wasp == null) return SINGLE_SUCCESS;
             PlayerEntity player = PlayerArgumentType.get(context);
 
             if (player == mc.player) throw CANT_WASP_SELF.create();

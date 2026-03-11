@@ -255,7 +255,7 @@ public class AutoLog extends Module {
         text.append(reason);
 
         AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
-        if (autoReconnect.isActive() && toggleAutoReconnect.get()) {
+        if (autoReconnect != null && autoReconnect.isActive() && toggleAutoReconnect.get()) {
             text.append(Text.literal("\n\nINFO - AutoReconnect was disabled").withColor(Colors.GRAY));
             autoReconnect.toggle();
         }

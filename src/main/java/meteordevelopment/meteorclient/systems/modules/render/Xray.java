@@ -118,17 +118,17 @@ public class Xray extends Module {
         WallHack wallHack = Modules.get().get(WallHack.class);
         Xray xray = Modules.get().get(Xray.class);
 
-        if (wallHack.isActive() && wallHack.blocks.get().contains(state.getBlock())) {
+        if (wallHack != null && wallHack.isActive() && wallHack.blocks.get().contains(state.getBlock())) {
             if (MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse()) return 0;
 
             int alpha;
 
-            if (xray.isActive()) alpha = xray.opacity.get();
+            if (xray != null && xray.isActive()) alpha = xray.opacity.get();
             else alpha = wallHack.opacity.get();
 
             return alpha;
         }
-        else if (xray.isActive() && !wallHack.isActive() && xray.isBlocked(state.getBlock(), pos)) {
+        else if (xray != null && xray.isActive() && (wallHack == null || !wallHack.isActive()) && xray.isBlocked(state.getBlock(), pos)) {
             return ((MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse())) ? 0 : xray.opacity.get();
         }
 

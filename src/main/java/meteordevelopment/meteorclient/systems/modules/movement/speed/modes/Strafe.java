@@ -60,7 +60,7 @@ public class Strafe extends SpeedMode {
         Vector2d change = transformStrafe(speed);
 
         Anchor anchor = Modules.get().get(Anchor.class);
-        if (anchor.isActive() && anchor.controlMovement) {
+        if (anchor != null && anchor.isActive() && anchor.controlMovement) {
             change.set(anchor.deltaX, anchor.deltaZ);
         }
 

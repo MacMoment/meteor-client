@@ -23,7 +23,8 @@ public class SodiumWorldRendererMixin {
     private FogParameters modifyFogParameters(FogParameters fogParameters) {
         if (Modules.get() == null) return fogParameters;
 
-        if (Modules.get().get(NoRender.class).noFog()) return DISABLED_FOG;
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noFog()) return DISABLED_FOG;
 
         return fogParameters;
     }

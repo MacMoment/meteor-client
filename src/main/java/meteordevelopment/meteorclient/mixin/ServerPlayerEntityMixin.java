@@ -28,7 +28,10 @@ public abstract class ServerPlayerEntityMixin extends LivingEntity {
         if (!getEntityWorld().isClient()) return;
 
         Anchor module = Modules.get().get(Anchor.class);
-        if (module.isActive() && module.cancelJump) ci.cancel();
-        else if (Modules.get().get(Scaffold.class).towering()) ci.cancel();
+        if (module != null && module.isActive() && module.cancelJump) ci.cancel();
+        else {
+            Scaffold scaffold = Modules.get().get(Scaffold.class);
+            if (scaffold != null && scaffold.towering()) ci.cancel();
+        }
     }
 }

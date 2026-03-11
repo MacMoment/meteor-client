@@ -22,7 +22,9 @@ public class ProjectileUtilMixin {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getBoundingBox()Lnet/minecraft/util/math/Box;")
     )
     private static Box modifyHitboxMargin(Box original, @Local(ordinal = 1) Entity entity2) {
-        double v = Modules.get().get(Hitboxes.class).getEntityValue(entity2);
+        Hitboxes hitboxes = Modules.get().get(Hitboxes.class);
+        if (hitboxes == null) return original;
+        double v = hitboxes.getEntityValue(entity2);
         if (v == 0) return original;
 
         return original.expand(v);

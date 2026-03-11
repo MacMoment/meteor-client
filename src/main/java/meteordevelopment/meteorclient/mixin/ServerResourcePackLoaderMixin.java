@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerResourcePackLoaderMixin {
     @Inject(method = "onReloadSuccess", at = @At("TAIL"))
     private void removeInactivePacksTail(CallbackInfo ci) {
-        Modules.get().get(ServerSpoof.class).silentAcceptResourcePack = false;
+        ServerSpoof serverSpoof = Modules.get().get(ServerSpoof.class);
+        if (serverSpoof != null) serverSpoof.silentAcceptResourcePack = false;
     }
 }

@@ -16,11 +16,15 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class TooltipDisplayComponentMixin {
     @ModifyExpressionValue(method = "shouldDisplay", at = @At(value = "FIELD", target = "Lnet/minecraft/component/type/TooltipDisplayComponent;hideTooltip:Z"))
     private boolean modifyHideTooltip(boolean original) {
-        return original && !Modules.get().get(BetterTooltips.class).tooltip.get();
+        BetterTooltips betterTooltips = Modules.get().get(BetterTooltips.class);
+        if (betterTooltips == null) return original;
+        return original && !betterTooltips.tooltip.get();
     }
 
     @ModifyExpressionValue(method = "shouldDisplay", at = @At(value = "INVOKE", target = "Ljava/util/SequencedSet;contains(Ljava/lang/Object;)Z"))
     private boolean modifyHiddenComponents(boolean original) {
-        return original && !Modules.get().get(BetterTooltips.class).additional.get();
+        BetterTooltips betterTooltips = Modules.get().get(BetterTooltips.class);
+        if (betterTooltips == null) return original;
+        return original && !betterTooltips.additional.get();
     }
 }

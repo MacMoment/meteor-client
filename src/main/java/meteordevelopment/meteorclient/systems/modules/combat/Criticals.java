@@ -96,7 +96,8 @@ public class Criticals extends Module {
 
                 Entity entity = packet.meteor$getEntity();
 
-                if (!(entity instanceof LivingEntity) || (entity != Modules.get().get(KillAura.class).getTarget() && ka.get()))
+                KillAura killAura = Modules.get().get(KillAura.class);
+                if (!(entity instanceof LivingEntity) || ((killAura == null || entity != killAura.getTarget()) && ka.get()))
                     return;
 
                 switch (mode.get()) {
