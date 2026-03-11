@@ -26,7 +26,8 @@ public abstract class PlayerListEntryMixin {
     @Inject(method = "getSkinTextures", at = @At("HEAD"), cancellable = true)
     private void onGetTexture(CallbackInfoReturnable<SkinTextures> info) {
         if (getProfile().name().equals(MinecraftClient.getInstance().getSession().getUsername())) {
-            if (Modules.get().get(NameProtect.class).skinProtect()) {
+            NameProtect nameProtect = Modules.get().get(NameProtect.class);
+            if (nameProtect != null && nameProtect.skinProtect()) {
                 info.setReturnValue(DefaultSkinHelper.getSkinTextures(getProfile()));
             }
         }

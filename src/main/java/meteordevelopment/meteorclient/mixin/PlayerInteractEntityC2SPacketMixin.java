@@ -36,6 +36,8 @@ public abstract class PlayerInteractEntityC2SPacketMixin implements IPlayerInter
 
     @ModifyVariable(method = "<init>(IZLnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private static boolean setSneaking(boolean sneaking) {
-        return Modules.get().get(Sneak.class).doPacket() || Modules.get().get(NoSlow.class).airStrict() || sneaking;
+        Sneak sneak = Modules.get().get(Sneak.class);
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        return (sneak != null && sneak.doPacket()) || (noSlow != null && noSlow.airStrict()) || sneaking;
     }
 }

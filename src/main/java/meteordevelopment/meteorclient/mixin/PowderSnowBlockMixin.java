@@ -19,7 +19,8 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public abstract class PowderSnowBlockMixin {
     @ModifyReturnValue(method = "canWalkOnPowderSnow", at = @At("RETURN"))
     private static boolean onCanWalkOnPowderSnow(boolean original, Entity entity) {
-        if (entity == mc.player && Modules.get().get(Jesus.class).canWalkOnPowderSnow()) return true;
+        Jesus jesus = Modules.get().get(Jesus.class);
+        if (entity == mc.player && jesus != null && jesus.canWalkOnPowderSnow()) return true;
         return original;
     }
 }

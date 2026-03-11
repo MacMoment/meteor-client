@@ -29,6 +29,7 @@ public abstract class RenderSystemMixin {
         OutlineUniforms.flipFrame();
 
         if (Modules.get() == null || mc.player == null) return;
-        if (Modules.get().get(InventoryTweaks.class).frameInput()) ((MinecraftClientAccessor) mc).meteor$handleInputEvents();
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        if (inventoryTweaks != null && inventoryTweaks.frameInput()) ((MinecraftClientAccessor) mc).meteor$handleInputEvents();
     }
 }

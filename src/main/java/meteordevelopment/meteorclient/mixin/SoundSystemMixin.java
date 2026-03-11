@@ -34,6 +34,7 @@ public abstract class SoundSystemMixin {
 
     @Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sound/TickableSoundInstance;tick()V", ordinal = 0))
     private void onTick(CallbackInfo ci, @Local TickableSoundInstance tickableSoundInstance) {
-        if (Modules.get().get(SoundBlocker.class).shouldBlock(tickableSoundInstance)) stop(tickableSoundInstance);
+        SoundBlocker soundBlocker = Modules.get().get(SoundBlocker.class);
+        if (soundBlocker != null && soundBlocker.shouldBlock(tickableSoundInstance)) stop(tickableSoundInstance);
     }
 }

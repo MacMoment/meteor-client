@@ -20,7 +20,8 @@ public abstract class StatusEffectInstanceMixin {
     private void tick(CallbackInfo info) {
         if (!Utils.canUpdate()) return;
 
-        if (Modules.get().get(PotionSaver.class).shouldFreeze(((StatusEffectInstance) (Object) this).getEffectType().value())) {
+        PotionSaver potionSaver = Modules.get().get(PotionSaver.class);
+        if (potionSaver != null && potionSaver.shouldFreeze(((StatusEffectInstance) (Object) this).getEffectType().value())) {
             info.cancel();
         }
     }

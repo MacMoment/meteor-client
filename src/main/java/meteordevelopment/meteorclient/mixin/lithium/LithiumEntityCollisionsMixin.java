@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class LithiumEntityCollisionsMixin {
     @Inject(method = "isWithinWorldBorder", at = @At("HEAD"), cancellable = true)
     private static void onIsWithinWorldBorder(WorldBorder border, Box box, CallbackInfoReturnable<Boolean> cir) {
-        if (Modules.get().get(Collisions.class).ignoreBorder()) {
+        Collisions collisions = Modules.get().get(Collisions.class);
+        if (collisions != null && collisions.ignoreBorder()) {
             cir.setReturnValue(true);
         }
     }
