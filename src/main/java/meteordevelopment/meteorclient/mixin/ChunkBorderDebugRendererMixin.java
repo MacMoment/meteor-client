@@ -26,7 +26,7 @@ public abstract class ChunkBorderDebugRendererMixin {
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/ChunkSectionPos;from(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/ChunkSectionPos;"))
     private ChunkSectionPos render$getChunkPos(ChunkSectionPos original) {
         Freecam freecam = Modules.get().get(Freecam.class);
-        if (!freecam.isActive()) return original;
+        if (freecam == null || !freecam.isActive()) return original;
 
         float delta = client.getRenderTickCounter().getTickProgress(true);
 

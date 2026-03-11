@@ -101,10 +101,11 @@ public abstract class ChatHudMixin implements IChatHud {
         else {
             visibleMessages.removeIf(msg -> ((IChatHudLine) (Object) msg).meteor$getId() == nextId && nextId != 0);
 
+            BetterChat bc = getBetterChat();
             for (int i = messages.size() - 1; i > -1; i--) {
                 if (((IChatHudLine) (Object) messages.get(i)).meteor$getId() == nextId && nextId != 0) {
                     messages.remove(i);
-                    getBetterChat().removeLine(i);
+                    if (bc != null) bc.removeLine(i);
                 }
             }
 
@@ -118,23 +119,26 @@ public abstract class ChatHudMixin implements IChatHud {
     //modify max lengths for messages and visible messages
     @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "CONSTANT", args = "intValue=100"))
     private int maxLength(int size) {
-        if (Modules.get() == null || !getBetterChat().isLongerChat()) return size;
+        BetterChat bc = getBetterChat();
+        if (Modules.get() == null || bc == null || !bc.isLongerChat()) return size;
 
-        return size + betterChat.getExtraChatLines();
+        return size + bc.getExtraChatLines();
     }
 
     @ModifyExpressionValue(method = "addVisibleMessage", at = @At(value = "CONSTANT", args = "intValue=100"))
     private int maxLengthVisible(int size) {
-        if (Modules.get() == null || !getBetterChat().isLongerChat()) return size;
+        BetterChat bc = getBetterChat();
+        if (Modules.get() == null || bc == null || !bc.isLongerChat()) return size;
 
-        return size + betterChat.getExtraChatLines();
+        return size + bc.getExtraChatLines();
     }
 
     // Player Heads
 
     @ModifyExpressionValue(method = "render(Lnet/minecraft/client/gui/hud/ChatHud$Backend;IIZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;ceil(F)I"))
     private int onRender_modifyWidth(int width) {
-        return getBetterChat().modifyChatWidth(width);
+        BetterChat bc = getBetterChat();
+        return bc != null ? bc.modifyChatWidth(width) : width;
     }
 
     // Anti spam
@@ -143,30 +147,36 @@ public abstract class ChatHudMixin implements IChatHud {
     private void onBreakChatMessageLines(ChatHudLine message, CallbackInfo ci, @Local List<OrderedText> list) {
         if (Modules.get() == null) return; // baritone calls addMessage before we initialise
 
-        getBetterChat().lines.addFirst(list.size());
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.lines.addFirst(list.size());
     }
 
     @Inject(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;removeLast()Ljava/lang/Object;"))
     private void onRemoveMessage(ChatHudLine message, CallbackInfo ci) {
         if (Modules.get() == null) return;
 
-        int extra = getBetterChat().isLongerChat() ? getBetterChat().getExtraChatLines() : 0;
-        int size = betterChat.lines.size();
+        BetterChat bc = getBetterChat();
+        if (bc == null) return;
+
+        int extra = bc.isLongerChat() ? bc.getExtraChatLines() : 0;
+        int size = bc.lines.size();
 
         while (size > 100 + extra) {
-            betterChat.lines.removeLast();
+            bc.lines.removeLast();
             size--;
         }
     }
 
     @Inject(method = "clear", at = @At("HEAD"))
     private void onClear(boolean clearHistory, CallbackInfo ci) {
-        getBetterChat().lines.clear();
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.lines.clear();
     }
 
     @Inject(method = "refresh", at = @At("HEAD"))
     private void onRefresh(CallbackInfo ci) {
-        getBetterChat().lines.clear();
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.lines.clear();
     }
 
     // Other

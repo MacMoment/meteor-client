@@ -21,7 +21,7 @@ public abstract class EndCrystalEntityModelMixin {
     @ModifyExpressionValue(method = "setAngles(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EndCrystalEntityRenderer;getYOffset(F)F"))
     private float setAngles$bounce(float original, EndCrystalEntityRenderState state) {
         Chams module = Modules.get().get(Chams.class);
-        if (!module.isActive() || !module.crystals.get()) return original;
+        if (module == null || !module.isActive() || !module.crystals.get()) return original;
 
         float g = MathHelper.sin(state.age * 0.2F) / 2.0F + 0.5F;
         g = (g * g + g) * 0.4F * module.crystalsBounce.get().floatValue();
@@ -33,7 +33,7 @@ public abstract class EndCrystalEntityModelMixin {
     @ModifyExpressionValue(method = "setAngles(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;age:F", ordinal = 0))
     private float modifySpeed(float original) {
         Chams module = Modules.get().get(Chams.class);
-        if (!module.isActive() || !module.crystals.get()) return original;
+        if (module == null || !module.isActive() || !module.crystals.get()) return original;
 
         return original * module.crystalsRotationSpeed.get().floatValue();
     }

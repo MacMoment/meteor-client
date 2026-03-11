@@ -34,7 +34,7 @@ public abstract class ContainerComponentMixin {
         if (Modules.get() == null) return;
 
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
-        if (tooltips.isActive()) {
+        if (tooltips != null && tooltips.isActive()) {
             if (tooltips.previewShulkers()) ci.cancel();
             else if (tooltips.shulkerCompactTooltip()) {
                 ci.cancel();

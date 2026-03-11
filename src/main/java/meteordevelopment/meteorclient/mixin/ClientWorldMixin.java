@@ -41,18 +41,21 @@ public abstract class ClientWorldMixin {
 
     @ModifyArgs(method = "doRandomBlockDisplayTicks", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;randomBlockDisplayTick(IIIILnet/minecraft/util/math/random/Random;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos$Mutable;)V"))
     private void doRandomBlockDisplayTicks(Args args) {
-        if (Modules.get().get(NoRender.class).noBarrierInvis()) {
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noBarrierInvis()) {
             args.set(5, Blocks.BARRIER);
         }
     }
 
     @Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
     private void onAddBlockBreakParticles(BlockPos blockPos, BlockState state, CallbackInfo info) {
-        if (Modules.get().get(NoRender.class).noBlockBreakParticles()) info.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noBlockBreakParticles()) info.cancel();
     }
 
     @Inject(method = "spawnBlockBreakingParticle", at = @At("HEAD"), cancellable = true)
     private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo info) {
-        if (Modules.get().get(NoRender.class).noBlockBreakParticles()) info.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noBlockBreakParticles()) info.cancel();
     }
 }
