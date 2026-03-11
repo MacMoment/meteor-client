@@ -49,7 +49,7 @@ public abstract class BlockColorsMixin {
         if (Modules.get() == null) return original;
 
         Ambience ambience = Modules.get().get(Ambience.class);
-        if (ambience.isActive() && ambience.customFoliageColor.get()) {
+        if (ambience != null && ambience.isActive() && ambience.customFoliageColor.get()) {
             return ambience.foliageColor.get().getPacked();
         }
 

@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BlockRenderManagerMixin {
     @Inject(method = "renderDamage", at = @At("HEAD"), cancellable = true)
     private void renderDamage(BlockState state, BlockPos pos, BlockRenderView world, MatrixStack matrix, VertexConsumer vertexConsumer, CallbackInfo info) {
-        if (Modules.get().isActive(BreakIndicators.class) || Modules.get().get(NoRender.class).noBlockBreakOverlay()) info.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (Modules.get().isActive(BreakIndicators.class) || (noRender != null && noRender.noBlockBreakOverlay())) info.cancel();
     }
 }

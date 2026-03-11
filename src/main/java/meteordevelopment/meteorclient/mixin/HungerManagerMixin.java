@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 public class HungerManagerMixin {
     @ModifyExpressionValue(method = "canSprint()Z", at = @At(value = "CONSTANT", args = "floatValue=6.0f"))
     private float onHunger(float constant) {
-        if (Modules.get().get(NoSlow.class).hunger()) return -1;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.hunger()) return -1;
         return constant;
     }
 }

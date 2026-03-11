@@ -39,20 +39,22 @@ public abstract class CameraMixin implements ICamera {
 
     @Inject(method = "getSubmersionType", at = @At("HEAD"), cancellable = true)
     private void getSubmergedFluidState(CallbackInfoReturnable<CameraSubmersionType> ci) {
-        if (Modules.get().get(NoRender.class).noLiquidOverlay()) ci.setReturnValue(CameraSubmersionType.NONE);
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noLiquidOverlay()) ci.setReturnValue(CameraSubmersionType.NONE);
     }
 
     @ModifyVariable(method = "clipToSpace", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float modifyClipToSpace(float d) {
-        if (Modules.get().get(Freecam.class).isActive()) return 0;
+        if (Modules.get().isActive(Freecam.class)) return 0;
 
         CameraTweaks cameraTweaks = Modules.get().get(CameraTweaks.class);
-        return cameraTweaks.isActive() ? (float) cameraTweaks.distance : d;
+        return cameraTweaks != null && cameraTweaks.isActive() ? (float) cameraTweaks.distance : d;
     }
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
     private void onClipToSpace(float desiredCameraDistance, CallbackInfoReturnable<Float> info) {
-        if (Modules.get().get(CameraTweaks.class).clip()) {
+        CameraTweaks cameraTweaks = Modules.get().get(CameraTweaks.class);
+        if (cameraTweaks != null && cameraTweaks.clip()) {
             info.setReturnValue(desiredCameraDistance);
         }
     }
@@ -68,7 +70,7 @@ public abstract class CameraMixin implements ICamera {
     private void onUpdateSetPosArgs(Args args, @Local(argsOnly = true) float tickDelta) {
         Freecam freecam = Modules.get().get(Freecam.class);
 
-        if (freecam.isActive()) {
+        if (freecam != null && freecam.isActive()) {
             args.set(0, freecam.getX(tickDelta));
             args.set(1, freecam.getY(tickDelta));
             args.set(2, freecam.getZ(tickDelta));
@@ -80,7 +82,7 @@ public abstract class CameraMixin implements ICamera {
         Freecam freecam = Modules.get().get(Freecam.class);
         FreeLook freeLook = Modules.get().get(FreeLook.class);
 
-        if (freecam.isActive()) {
+        if (freecam != null && freecam.isActive()) {
             args.set(0, (float) freecam.getYaw(tickDelta));
             args.set(1, (float) freecam.getPitch(tickDelta));
         }
@@ -88,7 +90,7 @@ public abstract class CameraMixin implements ICamera {
             args.set(0, yaw);
             args.set(1, pitch);
         }
-        else if (freeLook.isActive()) {
+        else if (freeLook != null && freeLook.isActive()) {
             args.set(0, freeLook.cameraYaw);
             args.set(1, freeLook.cameraPitch);
         }

@@ -70,7 +70,7 @@ public abstract class ClientPlayerInteractionManagerMixin implements IClientPlay
             SpeedMine sm = Modules.get().get(SpeedMine.class);
             BlockState state = mc.world.getBlockState(blockPos);
 
-            if (!sm.instamine() || !sm.filter(state.getBlock())) return;
+            if (sm == null || !sm.instamine() || !sm.filter(state.getBlock())) return;
 
             if (state.calcBlockBreakingDelta(mc.player, mc.world, blockPos) > 0.5f) {
                 breakBlock(blockPos);
@@ -121,7 +121,8 @@ public abstract class ClientPlayerInteractionManagerMixin implements IClientPlay
 
     @ModifyExpressionValue(method = "method_41930", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;calcBlockBreakingDelta(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F"))
     private float modifyBlockBreakingDelta(float original) {
-        if (Modules.get().get(BreakDelay.class).preventInstaBreak() && original >= 1) {
+        BreakDelay breakDelay = Modules.get().get(BreakDelay.class);
+        if (breakDelay != null && breakDelay.preventInstaBreak() && original >= 1) {
             BlockBreakingCooldownEvent event = MeteorClient.EVENT_BUS.post(BlockBreakingCooldownEvent.get(blockBreakingCooldown));
             blockBreakingCooldown = event.cooldown;
             return 0;

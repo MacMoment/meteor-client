@@ -55,9 +55,10 @@ public abstract class ClientConnectionMixin {
 
     @Inject(method = "disconnect(Lnet/minecraft/text/Text;)V", at = @At("HEAD"))
     private void disconnect(Text disconnectReason, CallbackInfo ci) {
-        if (Modules.get().get(HighwayBuilder.class).isActive()) {
+        HighwayBuilder highwayBuilder = Modules.get().get(HighwayBuilder.class);
+        if (highwayBuilder != null && highwayBuilder.isActive()) {
             MutableText text = Text.literal("%n%n%s[%sHighway Builder%s] Statistics:%n".formatted(Formatting.GRAY, Formatting.BLUE, Formatting.GRAY));
-            text.append(Modules.get().get(HighwayBuilder.class).getStatsText());
+            text.append(highwayBuilder.getStatsText());
 
             ((MutableText) disconnectReason).append(text);
         }
@@ -83,7 +84,7 @@ public abstract class ClientConnectionMixin {
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
     private void exceptionCaught(ChannelHandlerContext context, Throwable throwable, CallbackInfo ci) {
         AntiPacketKick apk = Modules.get().get(AntiPacketKick.class);
-        if (!(throwable instanceof TimeoutException) && !(throwable instanceof PacketEncoderException) && apk.catchExceptions()) {
+        if (apk != null && !(throwable instanceof TimeoutException) && !(throwable instanceof PacketEncoderException) && apk.catchExceptions()) {
             if (apk.logExceptions.get()) apk.warning("Caught exception: %s", throwable);
             ci.cancel();
         }

@@ -179,7 +179,7 @@ public abstract class MinecraftClientMixin implements IMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isItemEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z"))
     private void onDoItemUseHand(CallbackInfo ci, @Local ItemStack itemStack) {
         FastUse fastUse = Modules.get().get(FastUse.class);
-        if (fastUse.isActive()) {
+        if (fastUse != null && fastUse.isActive()) {
             itemUseCooldown = fastUse.getItemUseCooldown(itemStack);
         }
     }
@@ -223,7 +223,7 @@ public abstract class MinecraftClientMixin implements IMinecraftClient {
     @Unique
     private boolean HB$stopUsingItem() {
         HighwayBuilder b = Modules.get().get(HighwayBuilder.class);
-        return !b.isActive() || !b.drawingBow;
+        return b == null || !b.isActive() || !b.drawingBow;
     }
 
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
@@ -260,12 +260,14 @@ public abstract class MinecraftClientMixin implements IMinecraftClient {
 
     @ModifyExpressionValue(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z", ordinal = 0))
     private boolean handleInputEventsModifyIsUsingItem(boolean original) {
-        return !Modules.get().get(Multitask.class).attackingEntities() && original;
+        Multitask multitask = Modules.get().get(Multitask.class);
+        return (multitask == null || !multitask.attackingEntities()) && original;
     }
 
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void handleInputEventsInjectStopUsingItem(CallbackInfo info) {
-        if (Modules.get().get(Multitask.class).attackingEntities() && player.isUsingItem()) {
+        Multitask multitask = Modules.get().get(Multitask.class);
+        if (multitask != null && multitask.attackingEntities() && player.isUsingItem()) {
             if (!options.useKey.isPressed() && HB$stopUsingItem()) interactionManager.stopUsingItem(player);
             //noinspection StatementWithEmptyBody
             while (options.useKey.wasPressed());
@@ -291,18 +293,21 @@ public abstract class MinecraftClientMixin implements IMinecraftClient {
 
     @WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;handleInputEvents()V"))
     private boolean wrapHandleInputEvents(MinecraftClient instance) {
-        return !Modules.get().get(InventoryTweaks.class).frameInput();
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        return inventoryTweaks == null || !inventoryTweaks.frameInput();
     }
 
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;handleBlockBreaking(Z)V"))
     private boolean wrapHandleBlockBreaking(MinecraftClient instance, boolean breaking) {
         isBreaking = breaking;
-        return !Modules.get().get(InventoryTweaks.class).frameInput();
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        return inventoryTweaks == null || !inventoryTweaks.frameInput();
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;handleInputEvents()V", shift = At.Shift.AFTER))
     private void afterHandleInputEvents(CallbackInfo ci) {
-        if (!Modules.get().get(InventoryTweaks.class).frameInput()) return;
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        if (inventoryTweaks == null || !inventoryTweaks.frameInput()) return;
 
         handleBlockBreaking(isBreaking);
         isBreaking = false;

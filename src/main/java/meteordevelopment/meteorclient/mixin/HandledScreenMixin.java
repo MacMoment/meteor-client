@@ -68,7 +68,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onInit(CallbackInfo info) {
         InventoryTweaks invTweaks = Modules.get().get(InventoryTweaks.class);
 
-        if (invTweaks.isActive() && invTweaks.showButtons() && invTweaks.canSteal(getScreenHandler())) {
+        if (invTweaks != null && invTweaks.isActive() && invTweaks.showButtons() && invTweaks.canSteal(getScreenHandler())) {
             addDrawableChild(
                 new ButtonWidget.Builder(Text.literal("Steal"), button -> invTweaks.steal(getScreenHandler()))
                     .position(x, y - 22)
@@ -88,7 +88,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     // Inventory Tweaks
     @Inject(method = "mouseDragged", at = @At("TAIL"))
     private void onMouseDragged(Click click, double offsetX, double offsetY, CallbackInfoReturnable<Boolean> cir) {
-        if (click.button() != GLFW_MOUSE_BUTTON_LEFT || doubleClicking || !Modules.get().get(InventoryTweaks.class).mouseDragItemMove()) return;
+        InventoryTweaks invTweaksDrag = Modules.get().get(InventoryTweaks.class);
+        if (click.button() != GLFW_MOUSE_BUTTON_LEFT || doubleClicking || invTweaksDrag == null || !invTweaksDrag.mouseDragItemMove()) return;
 
         Slot slot = getSlotAt(click.x(), click.y());
         if (slot != null && slot.hasStack() && mc.isShiftPressed()) onMouseClick(slot, slot.id, click.button(), SlotActionType.QUICK_MOVE);
@@ -98,6 +99,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void mouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
+        if (tooltips == null) return;
 
         if (tooltips.shouldOpenContents(click) && focusedSlot != null && !focusedSlot.getStack().isEmpty() && getScreenHandler().getCursorStack().isEmpty()) {
             if (tooltips.openContent(focusedSlot.getStack())) {
@@ -110,6 +112,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         BetterTooltips tooltips = Modules.get().get(BetterTooltips.class);
+        if (tooltips == null) return;
 
         if (tooltips.shouldOpenContents(input) && focusedSlot != null && !focusedSlot.getStack().isEmpty() && getScreenHandler().getCursorStack().isEmpty()) {
             if (tooltips.openContent(focusedSlot.getStack())) {
@@ -121,7 +124,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     // Item Highlight
     @Inject(method = "drawSlot", at = @At("HEAD"))
     private void onDrawSlot(DrawContext context, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-        int color = Modules.get().get(ItemHighlight.class).getColor(slot.getStack());
+        ItemHighlight itemHighlight = Modules.get().get(ItemHighlight.class);
+        if (itemHighlight == null) return;
+        int color = itemHighlight.getColor(slot.getStack());
         if (color != -1) context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color);
     }
 

@@ -23,6 +23,7 @@ public class ArmorStandEntityRendererMixin {
     @ModifyExpressionValue(method = "getRenderLayer(Lnet/minecraft/client/render/entity/state/ArmorStandEntityRenderState;ZZZ)Lnet/minecraft/client/render/RenderLayer;", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/entity/state/ArmorStandEntityRenderState;marker:Z", opcode = Opcodes.GETFIELD))
     private boolean modifyMarkerValue(boolean original) {
         if (esp == null) esp = Modules.get().get(ESP.class);
+        if (esp == null) return original;
 
         return original && !(esp.isActive() && !esp.shouldSkip(EntityType.ARMOR_STAND));
     }

@@ -21,12 +21,14 @@ public class ChatHudLineConsumerMixin {
     // Player Heads, also draw immediately when line is set
     @Inject(method = "accept", at = @At("HEAD"))
     private void setLine(ChatHudLine.Visible visible, int i, float f, CallbackInfo ci) {
-        Modules.get().get(BetterChat.class).line = visible;
+        BetterChat betterChat = Modules.get().get(BetterChat.class);
+        if (betterChat != null) betterChat.line = visible;
     }
 
     // No Message Signature Indicator
     @ModifyExpressionValue(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
     private MessageIndicator onRender_modifyIndicator(MessageIndicator indicator) {
-        return Modules.get().get(NoRender.class).noMessageSignatureIndicator() ? null : indicator;
+        NoRender noRender = Modules.get().get(NoRender.class);
+        return (noRender != null && noRender.noMessageSignatureIndicator()) ? null : indicator;
     }
 }

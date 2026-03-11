@@ -21,6 +21,7 @@ public abstract class ChatScreenMixin {
 
     @Inject(method = "init", at = @At(value = "RETURN"))
     private void onInit(CallbackInfo info) {
-        if (Modules.get().get(BetterChat.class).isInfiniteChatBox()) chatField.setMaxLength(Integer.MAX_VALUE);
+        BetterChat betterChat = Modules.get().get(BetterChat.class);
+        if (betterChat != null && betterChat.isInfiniteChatBox()) chatField.setMaxLength(Integer.MAX_VALUE);
     }
 }

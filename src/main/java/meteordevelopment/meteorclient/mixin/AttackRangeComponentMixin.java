@@ -21,7 +21,9 @@ import java.util.function.ToDoubleFunction;
 public class AttackRangeComponentMixin {
     @ModifyExpressionValue(method = "isWithinRange(Lnet/minecraft/entity/LivingEntity;Ljava/util/function/ToDoubleFunction;D)Z", at = @At(value = "FIELD", target = "Lnet/minecraft/component/type/AttackRangeComponent;hitboxMargin:F", opcode = Opcodes.GETFIELD))
     private float modifyHitboxMargin(float original, LivingEntity entity, ToDoubleFunction<Vec3d> squaredDistanceFunction, double extraHitboxMargin) {
-        float v = (float) Modules.get().get(Hitboxes.class).getEntityValue(entity);
+        Hitboxes hitboxes = Modules.get().get(Hitboxes.class);
+        if (hitboxes == null) return original;
+        float v = (float) hitboxes.getEntityValue(entity);
         return original + v;
     }
 }

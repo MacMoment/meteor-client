@@ -35,20 +35,23 @@ public class ChatHudUnfocusedMixin {
     // Offset text to make room for player heads
     @ModifyArg(method = "text", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/DrawnTextConsumer;text(Lnet/minecraft/client/font/Alignment;IILnet/minecraft/client/font/DrawnTextConsumer$Transformation;Lnet/minecraft/text/OrderedText;)V"), index = 1)
     private int modifyX(int x) {
-        return getBetterChat().modifyChatWidth(x);
+        BetterChat bc = getBetterChat();
+        return bc != null ? bc.modifyChatWidth(x) : x;
     }
 
     // Player Heads for unfocused chat - draw before text
     @ModifyReceiver(method = "text", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/DrawnTextConsumer;text(Lnet/minecraft/client/font/Alignment;IILnet/minecraft/client/font/DrawnTextConsumer$Transformation;Lnet/minecraft/text/OrderedText;)V"))
     private DrawnTextConsumer onRender_beforeDrawText(DrawnTextConsumer instance, Alignment alignment, int x, int y, Transformation transformation, OrderedText orderedText) {
-        getBetterChat().beforeDrawMessage(context, y, ColorHelper.getWhite(transformation.opacity()));
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.beforeDrawMessage(context, y, ColorHelper.getWhite(transformation.opacity()));
         return instance;
     }
 
     // Clean up after drawing
     @Inject(method = "text", at = @At("TAIL"))
     private void onRender_afterDrawText(int y, float f, OrderedText orderedText, CallbackInfoReturnable<Boolean> cir) {
-        getBetterChat().afterDrawMessage();
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.afterDrawMessage();
     }
 
     @Unique

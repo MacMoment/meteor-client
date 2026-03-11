@@ -17,13 +17,15 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class AbstractBoatEntityMixin {
     @ModifyExpressionValue(method = "updatePaddles", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/vehicle/AbstractBoatEntity;pressingLeft:Z", opcode = Opcodes.GETFIELD))
     private boolean modifyPressingLeft(boolean original) {
-        if (Modules.get().isActive(EntityControl.class) && Modules.get().get(EntityControl.class).lockYaw.get()) return false;
+        EntityControl entityControl = Modules.get().get(EntityControl.class);
+        if (entityControl != null && entityControl.isActive() && entityControl.lockYaw.get()) return false;
         return original;
     }
 
     @ModifyExpressionValue(method = "updatePaddles", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/vehicle/AbstractBoatEntity;pressingRight:Z", opcode = Opcodes.GETFIELD))
     private boolean modifyPressingRight(boolean original) {
-        if (Modules.get().isActive(EntityControl.class) && Modules.get().get(EntityControl.class).lockYaw.get()) return false;
+        EntityControl entityControl = Modules.get().get(EntityControl.class);
+        if (entityControl != null && entityControl.isActive() && entityControl.lockYaw.get()) return false;
         return original;
     }
 }

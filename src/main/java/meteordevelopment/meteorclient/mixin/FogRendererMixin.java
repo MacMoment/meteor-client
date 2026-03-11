@@ -22,7 +22,7 @@ public abstract class FogRendererMixin {
         if (Modules.get() == null) return original;
 
         Ambience ambience = Modules.get().get(Ambience.class);
-        if (ambience.isActive() && ambience.customFogColor.get()) {
+        if (ambience != null && ambience.isActive() && ambience.customFogColor.get()) {
             return ambience.fogColor.get().getVec4f();
         }
 
@@ -33,6 +33,7 @@ public abstract class FogRendererMixin {
     private boolean modifyFogEnabled(boolean original) {
         if (Modules.get() == null) return original;
 
-        return original && !Modules.get().get(NoRender.class).noFog();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        return original && (noRender == null || !noRender.noFog());
     }
 }

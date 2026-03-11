@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 public class EntityHitboxDebugRendererMixin {
     @ModifyExpressionValue(method = "drawHitbox", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getBoundingBox()Lnet/minecraft/util/math/Box;", ordinal = 0))
     private Box meteor$createHitbox(Box original, Entity entity, float tickProgress, boolean inLocalServer) {
-        double v = Modules.get().get(Hitboxes.class).getEntityValue(entity);
+        Hitboxes hitboxes = Modules.get().get(Hitboxes.class);
+        double v = hitboxes != null ? hitboxes.getEntityValue(entity) : 0;
         if (v == 0) return original;
 
         return original.expand(v);

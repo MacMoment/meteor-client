@@ -60,19 +60,23 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyExpressionValue(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
     private boolean redirectUsingItem(boolean isUsingItem) {
-        if (Modules.get().get(NoSlow.class).items()) return false;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.items()) return false;
         return isUsingItem;
     }
 
     @Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
     private void onIsSneaking(CallbackInfoReturnable<Boolean> info) {
-        if (Modules.get().get(Scaffold.class).scaffolding()) info.setReturnValue(false);
-        if (Modules.get().get(Flight.class).noSneak()) info.setReturnValue(false);
+        Scaffold scaffold = Modules.get().get(Scaffold.class);
+        if (scaffold != null && scaffold.scaffolding()) info.setReturnValue(false);
+        Flight flight = Modules.get().get(Flight.class);
+        if (flight != null && flight.isActive() && flight.noSneak()) info.setReturnValue(false);
     }
 
     @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
     private void onShouldSlowDown(CallbackInfoReturnable<Boolean> info) {
-        if (Modules.get().get(NoSlow.class).sneaking()) {
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.sneaking()) {
             info.setReturnValue(isCrawling());
         }
     }
@@ -80,14 +84,16 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
     private void onPushOutOfBlocks(double x, double d, CallbackInfo info) {
         Velocity velocity = Modules.get().get(Velocity.class);
-        if (velocity.isActive() && velocity.blocks.get()) {
+        if (velocity != null && velocity.isActive() && velocity.blocks.get()) {
             info.cancel();
         }
     }
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/input/Input;playerInput:Lnet/minecraft/util/PlayerInput;", opcode = Opcodes.GETFIELD))
     private PlayerInput isSneaking(PlayerInput original) {
-        if (Modules.get().get(Sneak.class).doPacket() || Modules.get().get(NoSlow.class).airStrict()) {
+        Sneak sneak = Modules.get().get(Sneak.class);
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if ((sneak != null && sneak.doPacket()) || (noSlow != null && noSlow.airStrict())) {
             return new PlayerInput(
                 original.forward(),
                 original.backward(),
@@ -108,19 +114,22 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyReturnValue(method = "getMountJumpStrength", at = @At("RETURN"))
     private float modifyMountJumpStrength(float original) {
-        if (Modules.get().get(EntityControl.class).maxJump()) return 1f;
+        EntityControl entityControl = Modules.get().get(EntityControl.class);
+        if (entityControl != null && entityControl.maxJump()) return 1f;
         return original;
     }
 
     @Inject(method = "getJumpingMount", at = @At("RETURN"), cancellable = true)
     private void changeJumpingMount(CallbackInfoReturnable<JumpingMount> info) {
-        if (Modules.get().get(EntityControl.class).cancelJump()) info.setReturnValue(null);
+        EntityControl entityControl = Modules.get().get(EntityControl.class);
+        if (entityControl != null && entityControl.cancelJump()) info.setReturnValue(null);
     }
 
     @ModifyReturnValue(method = "getCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;", at = @At("RETURN"))
     private static HitResult onUpdateTargetedEntity(HitResult original, @Local HitResult hitResult) {
         if (original instanceof EntityHitResult ehr) {
-            if (Modules.get().get(NoMiningTrace.class).canWork(ehr.getEntity()) && hitResult.getType() == HitResult.Type.BLOCK) {
+            NoMiningTrace noMiningTrace = Modules.get().get(NoMiningTrace.class);
+            if (noMiningTrace != null && noMiningTrace.canWork(ehr.getEntity()) && hitResult.getType() == HitResult.Type.BLOCK) {
                 return hitResult;
             }
             else if (ehr.getEntity() instanceof FakePlayerEntity fakePlayer && fakePlayer.noHit) {
@@ -143,7 +152,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyExpressionValue(method = "canStartSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z"))
     private boolean modifyIsWalking(boolean original) {
-        if (!Modules.get().get(Sprint.class).rageSprint()) return original;
+        Sprint sprint = Modules.get().get(Sprint.class);
+        if (sprint == null || !sprint.rageSprint()) return original;
 
         float forwards = Math.abs(forwardSpeed);
         float sideways = Math.abs(sidewaysSpeed);
@@ -153,7 +163,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyExpressionValue(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z"))
     private boolean modifyMovement(boolean original) {
-        if (!Modules.get().get(Sprint.class).rageSprint()) return original;
+        Sprint sprint = Modules.get().get(Sprint.class);
+        if (sprint == null || !sprint.rageSprint()) return original;
 
         return Math.abs(sidewaysSpeed) > 1.0E-5F || Math.abs(forwardSpeed) > 1.0E-5F;
     }
@@ -161,7 +172,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @WrapWithCondition(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;setSprinting(Z)V", ordinal = 3))
     private boolean wrapSetSprinting(ClientPlayerEntity instance, boolean b) {
         Sprint s = Modules.get().get(Sprint.class);
-
+        if (s == null) return true;
         return !s.rageSprint() || s.unsprintInWater() && isTouchingWater();
     }
 

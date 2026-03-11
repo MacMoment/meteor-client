@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MobSpawnerBlockEntityRendererMixin implements BlockEntityRenderer<MobSpawnerBlockEntity, MobSpawnerBlockEntityRenderState> {
     @Inject(method = "renderDisplayEntity", at = @At("HEAD"), cancellable = true)
     private static void onRenderDisplayEntity(CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noMobInSpawner()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noMobInSpawner()) ci.cancel();
     }
 }

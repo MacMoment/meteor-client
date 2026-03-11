@@ -19,13 +19,15 @@ import org.spongepowered.asm.mixin.injection.At;
 public class BundleTooltipSubmenuHandlerMixin {
     @ModifyExpressionValue(method = "sendPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/BundleItem;getNumberOfStacksShown(Lnet/minecraft/item/ItemStack;)I"))
     private int uncapBundleScrolling1(int original, ItemStack item, int slotId, int selectedItemIndex) {
-        if (Modules.get().get(InventoryTweaks.class).uncapBundleScrolling()) return item.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).size();
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        if (inventoryTweaks != null && inventoryTweaks.uncapBundleScrolling()) return item.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).size();
         return original;
     }
 
     @ModifyExpressionValue(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/BundleItem;getNumberOfStacksShown(Lnet/minecraft/item/ItemStack;)I"))
     private int uncapBundleScrolling2(int original, double horizontal, double vertical, int slotId, ItemStack item) {
-        if (Modules.get().get(InventoryTweaks.class).uncapBundleScrolling()) return item.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).size();
+        InventoryTweaks inventoryTweaks = Modules.get().get(InventoryTweaks.class);
+        if (inventoryTweaks != null && inventoryTweaks.uncapBundleScrolling()) return item.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).size();
         return original;
     }
 }

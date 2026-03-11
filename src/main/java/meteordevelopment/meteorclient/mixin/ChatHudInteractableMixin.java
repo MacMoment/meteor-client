@@ -33,18 +33,21 @@ public class ChatHudInteractableMixin {
 
     @ModifyReceiver(method = "text", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/DrawnTextConsumer;text(Lnet/minecraft/client/font/Alignment;IILnet/minecraft/client/font/DrawnTextConsumer$Transformation;Lnet/minecraft/text/OrderedText;)V"))
     private DrawnTextConsumer onRender_beforeDrawTextWithShadow(DrawnTextConsumer instance, Alignment alignment, int x, int y, DrawnTextConsumer.Transformation transformation, OrderedText orderedText) {
-        getBetterChat().beforeDrawMessage(context, y, ColorHelper.getWhite(transformation.opacity()));
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.beforeDrawMessage(context, y, ColorHelper.getWhite(transformation.opacity()));
         return instance;
     }
 
     @ModifyArg(method = "text", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/DrawnTextConsumer;text(Lnet/minecraft/client/font/Alignment;IILnet/minecraft/client/font/DrawnTextConsumer$Transformation;Lnet/minecraft/text/OrderedText;)V"), index = 1)
     private int modifyX(int x) {
-        return getBetterChat().modifyChatWidth(x);
+        BetterChat bc = getBetterChat();
+        return bc != null ? bc.modifyChatWidth(x) : x;
     }
 
     @Inject(method = "text", at = @At("TAIL"))
     private void onRender_afterDrawTextWithShadow(int y, float f, OrderedText text, CallbackInfoReturnable<Boolean> cir) {
-        getBetterChat().afterDrawMessage();
+        BetterChat bc = getBetterChat();
+        if (bc != null) bc.afterDrawMessage();
     }
 
     @Unique

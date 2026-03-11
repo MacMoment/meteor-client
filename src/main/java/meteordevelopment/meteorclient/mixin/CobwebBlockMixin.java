@@ -27,6 +27,7 @@ public abstract class CobwebBlockMixin {
         "method_9548(Lnet/minecraft/class_2680;Lnet/minecraft/class_1937;Lnet/minecraft/class_2338;Lnet/minecraft/class_1297;Lnet/minecraft/class_10774;)V" // 1.21.9 intermediary
     }, at = @At("HEAD"), cancellable = true)
     private void onEntityCollision(CallbackInfo ci, @Local(argsOnly = true) Entity entity) {
-        if (entity == mc.player && Modules.get().get(NoSlow.class).cobweb()) ci.cancel();
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (entity == mc.player && noSlow != null && noSlow.cobweb()) ci.cancel();
     }
 }

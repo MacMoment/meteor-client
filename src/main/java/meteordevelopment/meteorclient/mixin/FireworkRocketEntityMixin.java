@@ -28,7 +28,8 @@ public abstract class FireworkRocketEntityMixin {
     private void onTick(CallbackInfo info) {
         FireworkRocketEntity firework = ((FireworkRocketEntity) (Object) this);
 
-        if (Modules.get().get(ElytraBoost.class).isFirework(firework) && this.life > this.lifeTime) {
+        ElytraBoost elytraBoost = Modules.get().get(ElytraBoost.class);
+        if (elytraBoost != null && elytraBoost.isFirework(firework) && this.life > this.lifeTime) {
             firework.discard();
         }
     }
@@ -37,7 +38,8 @@ public abstract class FireworkRocketEntityMixin {
     private void onEntityHit(EntityHitResult entityHitResult, CallbackInfo info) {
         FireworkRocketEntity firework = ((FireworkRocketEntity) (Object) this);
 
-        if (Modules.get().get(ElytraBoost.class).isFirework(firework)) {
+        ElytraBoost elytraBoost = Modules.get().get(ElytraBoost.class);
+        if (elytraBoost != null && elytraBoost.isFirework(firework)) {
             firework.discard();
             info.cancel();
         }
@@ -47,7 +49,8 @@ public abstract class FireworkRocketEntityMixin {
     private void onBlockHit(BlockHitResult blockHitResult, CallbackInfo info) {
         FireworkRocketEntity firework = ((FireworkRocketEntity) (Object) this);
 
-        if (Modules.get().get(ElytraBoost.class).isFirework(firework)) {
+        ElytraBoost elytraBoost = Modules.get().get(ElytraBoost.class);
+        if (elytraBoost != null && elytraBoost.isFirework(firework)) {
             firework.discard();
             info.cancel();
         }

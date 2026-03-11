@@ -48,7 +48,7 @@ public abstract class EntityMixin {
         if ((Object) this != mc.player) return vec;
 
         Velocity velocity = Modules.get().get(Velocity.class);
-        if (velocity.isActive() && velocity.liquids.get()) {
+        if (velocity != null && velocity.isActive() && velocity.liquids.get()) {
             vec = vec.multiply(velocity.getHorizontal(velocity.liquidsHorizontal), velocity.getVertical(velocity.liquidsVertical), velocity.getHorizontal(velocity.liquidsHorizontal));
         }
 
@@ -59,16 +59,18 @@ public abstract class EntityMixin {
     private void isTouchingWater(CallbackInfoReturnable<Boolean> info) {
         if ((Object) this != mc.player) return;
 
-        if (Modules.get().get(Flight.class).isActive()) info.setReturnValue(false);
-        if (Modules.get().get(NoSlow.class).fluidDrag()) info.setReturnValue(false);
+        if (Modules.get().isActive(Flight.class)) info.setReturnValue(false);
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.fluidDrag()) info.setReturnValue(false);
     }
 
     @Inject(method = "isInLava", at = @At(value = "HEAD"), cancellable = true)
     private void isInLava(CallbackInfoReturnable<Boolean> info) {
         if ((Object) this != mc.player) return;
 
-        if (Modules.get().get(Flight.class).isActive()) info.setReturnValue(false);
-        if (Modules.get().get(NoSlow.class).fluidDrag()) info.setReturnValue(false);
+        if (Modules.get().isActive(Flight.class)) info.setReturnValue(false);
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.fluidDrag()) info.setReturnValue(false);
     }
 
     @Inject(method = "onBubbleColumnSurfaceCollision", at = @At("HEAD"))
@@ -76,7 +78,7 @@ public abstract class EntityMixin {
         if ((Object) this != mc.player) return;
 
         Jesus jesus = Modules.get().get(Jesus.class);
-        if (jesus.isActive()) {
+        if (jesus != null && jesus.isActive()) {
             jesus.isInBubbleColumn = true;
         }
     }
@@ -86,7 +88,7 @@ public abstract class EntityMixin {
         if ((Object) this != mc.player) return;
 
         Jesus jesus = Modules.get().get(Jesus.class);
-        if (jesus.isActive()) {
+        if (jesus != null && jesus.isActive()) {
             jesus.isInBubbleColumn = true;
         }
     }
@@ -95,8 +97,9 @@ public abstract class EntityMixin {
     private boolean isSubmergedInWater(boolean submerged) {
         if ((Object) this != mc.player) return submerged;
 
-        if (Modules.get().get(NoSlow.class).fluidDrag()) return false;
-        if (Modules.get().get(Flight.class).isActive()) return false;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null && noSlow.fluidDrag()) return false;
+        if (Modules.get().isActive(Flight.class)) return false;
         return submerged;
     }
 
@@ -105,7 +108,7 @@ public abstract class EntityMixin {
         Velocity velocity = Modules.get().get(Velocity.class);
 
         // Velocity
-        if ((Object) this == mc.player && velocity.isActive() && velocity.entityPush.get()) {
+        if ((Object) this == mc.player && velocity != null && velocity.isActive() && velocity.entityPush.get()) {
             double multiplier = velocity.entityPushAmount.get();
             args.set(0, (double) args.get(0) * multiplier);
             args.set(2, (double) args.get(2) * multiplier);
@@ -141,27 +144,35 @@ public abstract class EntityMixin {
     private Block modifyVelocityMultiplierBlock(Block original) {
         if ((Object) this != mc.player) return original;
 
-        if (original == Blocks.SOUL_SAND && Modules.get().get(NoSlow.class).soulSand()) return Blocks.STONE;
-        if (original == Blocks.HONEY_BLOCK && Modules.get().get(NoSlow.class).honeyBlock()) return Blocks.STONE;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (noSlow != null) {
+            if (original == Blocks.SOUL_SAND && noSlow.soulSand()) return Blocks.STONE;
+            if (original == Blocks.HONEY_BLOCK && noSlow.honeyBlock()) return Blocks.STONE;
+        }
         return original;
     }
 
     @ModifyReturnValue(method = "isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z", at = @At("RETURN"))
     private boolean isInvisibleToCanceller(boolean original) {
         if (!Utils.canUpdate()) return original;
+        NoRender noRender = Modules.get().get(NoRender.class);
         ESP esp = Modules.get().get(ESP.class);
-        if (Modules.get().get(NoRender.class).noInvisibility() || esp.isActive() && !esp.shouldSkip((Entity) (Object) this)) return false;
+        if (noRender != null && noRender.noInvisibility()) return false;
+        if (esp != null && esp.isActive() && !esp.shouldSkip((Entity) (Object) this)) return false;
         return original;
     }
 
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
     private void isGlowing(CallbackInfoReturnable<Boolean> info) {
-        if (Modules.get().get(NoRender.class).noGlowing()) info.setReturnValue(false);
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noGlowing()) info.setReturnValue(false);
     }
 
     @Inject(method = "getTargetingMargin", at = @At("HEAD"), cancellable = true)
     private void onGetTargetingMargin(CallbackInfoReturnable<Float> info) {
-        double v = Modules.get().get(Hitboxes.class).getEntityValue((Entity) (Object) this);
+        Hitboxes hitboxes = Modules.get().get(Hitboxes.class);
+        if (hitboxes == null) return;
+        double v = hitboxes.getEntityValue((Entity) (Object) this);
         if (v != 0) info.setReturnValue((float) v);
     }
 
@@ -174,7 +185,8 @@ public abstract class EntityMixin {
     private void getPoseHook(CallbackInfoReturnable<EntityPose> info) {
         if ((Object) this != mc.player) return;
 
-        if (Modules.get().get(ElytraFly.class).canPacketEfly()) {
+        ElytraFly elytraFly = Modules.get().get(ElytraFly.class);
+        if (elytraFly != null && elytraFly.canPacketEfly()) {
             info.setReturnValue(EntityPose.GLIDING);
         }
     }
@@ -189,7 +201,8 @@ public abstract class EntityMixin {
 
     @ModifyReturnValue(method = "bypassesLandingEffects", at = @At("RETURN"))
     private boolean cancelBounce(boolean original) {
-        return Modules.get().get(NoFall.class).cancelBounce() || original;
+        NoFall noFall = Modules.get().get(NoFall.class);
+        return (noFall != null && noFall.cancelBounce()) || original;
     }
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
@@ -199,7 +212,7 @@ public abstract class EntityMixin {
         Freecam freecam = Modules.get().get(Freecam.class);
         FreeLook freeLook = Modules.get().get(FreeLook.class);
 
-        if (freecam.isActive()) {
+        if (freecam != null && freecam.isActive()) {
             freecam.changeLookDirection(cursorDeltaX * 0.15, cursorDeltaY * 0.15);
             ci.cancel();
         }
@@ -208,7 +221,7 @@ public abstract class EntityMixin {
             ((ICamera) camera).meteor$setRot(camera.getYaw() + cursorDeltaX * 0.15, camera.getPitch() + cursorDeltaY * 0.15);
             ci.cancel();
         }
-        else if (freeLook.cameraMode()) {
+        else if (freeLook != null && freeLook.cameraMode()) {
             freeLook.cameraYaw += (float) (cursorDeltaX / freeLook.sensitivity.get().floatValue());
             freeLook.cameraPitch += (float) (cursorDeltaY / freeLook.sensitivity.get().floatValue());
 

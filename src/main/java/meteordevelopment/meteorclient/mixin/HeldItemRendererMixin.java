@@ -52,7 +52,7 @@ public abstract class HeldItemRendererMixin {
         HandView module = Modules.get().get(HandView.class);
         Hand hand = MoreObjects.firstNonNull(mc.player.preferredHand, Hand.MAIN_HAND);
 
-        if (module.isActive()) {
+        if (module != null && module.isActive()) {
             if (hand == Hand.OFF_HAND && !mc.player.getOffHandStack().isEmpty()) {
                 return swingProgress + module.offSwing.get().floatValue();
             }
@@ -66,13 +66,15 @@ public abstract class HeldItemRendererMixin {
 
     @ModifyReturnValue(method = "shouldSkipHandAnimationOnSwap", at = @At("RETURN"))
     private boolean modifySkipSwapAnimation(boolean original) {
-        return original || Modules.get().get(HandView.class).skipSwapping();
+        HandView handView = Modules.get().get(HandView.class);
+        return original || (handView != null && handView.skipSwapping());
     }
 
     @ModifyArg(method = "updateHeldItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F", ordinal = 2), index = 0)
     private float modifyEquipProgressMainhand(float value) {
         float f = mc.player.getHandEquippingProgress(1f);
-        float modified = Modules.get().get(HandView.class).oldAnimations() ? 1 : f * f * f;
+        HandView handViewMain = Modules.get().get(HandView.class);
+        float modified = (handViewMain != null && handViewMain.oldAnimations()) ? 1 : f * f * f;
 
         return (shouldSkipHandAnimationOnSwap(mainHand, mc.player.getMainHandStack()) ? modified : 0) - equipProgressMainHand;
     }
@@ -94,6 +96,7 @@ public abstract class HeldItemRendererMixin {
 
     @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "INVOKE", target = "Ljava/lang/Math;pow(DD)D", shift = At.Shift.BEFORE), cancellable = true)
     private void cancelTransformations(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, PlayerEntity player, CallbackInfo ci) {
-        if (Modules.get().get(HandView.class).disableFoodAnimation()) ci.cancel();
+        HandView handViewFood = Modules.get().get(HandView.class);
+        if (handViewFood != null && handViewFood.disableFoodAnimation()) ci.cancel();
     }
 }

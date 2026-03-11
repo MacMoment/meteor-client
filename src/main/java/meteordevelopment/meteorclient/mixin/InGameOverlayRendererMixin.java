@@ -21,16 +21,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class InGameOverlayRendererMixin {
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderFireOverlay(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Sprite sprite, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noFireOverlay()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noFireOverlay()) ci.cancel();
     }
 
     @Inject(method = "renderUnderwaterOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderUnderwaterOverlay(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noLiquidOverlay()) ci.cancel();
+        NoRender noRenderWater = Modules.get().get(NoRender.class);
+        if (noRenderWater != null && noRenderWater.noLiquidOverlay()) ci.cancel();
     }
 
     @Inject(method = "renderInWallOverlay", at = @At("HEAD"), cancellable = true)
     private static void render(Sprite sprite, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noInWallOverlay()) ci.cancel();
+        NoRender noRenderWall = Modules.get().get(NoRender.class);
+        if (noRenderWall != null && noRenderWall.noInWallOverlay()) ci.cancel();
     }
 }

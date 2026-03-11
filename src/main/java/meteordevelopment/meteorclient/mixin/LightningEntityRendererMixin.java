@@ -25,7 +25,7 @@ public abstract class LightningEntityRendererMixin {
     private static void onSetLightningVertex(Matrix4f matrix4f, VertexConsumer vertexConsumer, float f, float g, int i, float h, float j, float k, float l, float m, float n, float o, boolean bl, boolean bl2, boolean bl3, boolean bl4, CallbackInfo ci) {
         Ambience ambience = Modules.get().get(Ambience.class);
 
-        if (ambience.isActive() && ambience.changeLightningColor.get()) {
+        if (ambience != null && ambience.isActive() && ambience.changeLightningColor.get()) {
             Color color = ambience.lightningColor.get();
 
             vertexConsumer.vertex(matrix4f, f + (bl ? o : -o), (float)(i * 16), g + (bl2 ? o : -o)).color(color.r / 255f, color.g / 255f, color.b / 255f, 0.3F);

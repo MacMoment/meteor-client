@@ -18,11 +18,13 @@ public interface BrightnessGetterMixin {
 
     @ModifyVariable(method = "method_68890", at = @At(value = "STORE"), ordinal = 0)
     private static int getLightmapCoordinatesModifySkyLight(int sky) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.SKY), sky);
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        return fullbright != null ? Math.max(fullbright.getLuminance(LightType.SKY), sky) : sky;
     }
 
     @ModifyVariable(method = "method_68890", at = @At(value = "STORE"), ordinal = 1)
     private static int getLightmapCoordinatesModifyBlockLight(int sky) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.BLOCK), sky);
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        return fullbright != null ? Math.max(fullbright.getLuminance(LightType.BLOCK), sky) : sky;
     }
 }
