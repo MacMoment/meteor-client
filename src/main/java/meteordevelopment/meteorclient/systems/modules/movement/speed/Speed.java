@@ -107,7 +107,8 @@ public class Speed extends Module {
 
     @Override
     public void onDeactivate() {
-        Modules.get().get(Timer.class).setOverride(Timer.OFF);
+        Timer timerModule = Modules.get().get(Timer.class);
+        if (timerModule != null) timerModule.setOverride(Timer.OFF);
         currentMode.onDeactivate();
     }
 
@@ -116,7 +117,8 @@ public class Speed extends Module {
         if (event.type != MovementType.SELF || stopSpeed()) return;
 
         if (timer.get() != Timer.OFF) {
-            Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
+            Timer timerModule = Modules.get().get(Timer.class);
+            if (timerModule != null) timerModule.setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
         }
 
         currentMode.onMove(event);

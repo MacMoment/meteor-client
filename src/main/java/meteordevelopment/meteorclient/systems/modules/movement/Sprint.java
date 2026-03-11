@@ -99,7 +99,8 @@ public class Sprint extends Module {
     }
 
     public boolean shouldSprint() {
-        if (mc.currentScreen != null && !Modules.get().get(GUIMove.class).sprint.get()) return false;
+        GUIMove guiMove = Modules.get().get(GUIMove.class);
+        if (mc.currentScreen != null && (guiMove == null || !guiMove.sprint.get())) return false;
 
         float movement = mode.get() == Mode.Rage
             ? (Math.abs(mc.player.forwardSpeed) + Math.abs(mc.player.sidewaysSpeed))
