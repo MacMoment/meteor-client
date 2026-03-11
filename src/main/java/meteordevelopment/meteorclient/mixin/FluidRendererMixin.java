@@ -30,7 +30,7 @@ public abstract class FluidRendererMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfo info) {
         Ambience ambience = Modules.get().get(Ambience.class);
-        ambient.set(ambience.isActive() && ambience.customLavaColor.get() && fluidState.isIn(FluidTags.LAVA));
+        ambient.set(ambience != null && ambience.isActive() && ambience.customLavaColor.get() && fluidState.isIn(FluidTags.LAVA));
 
         // Xray and Wallhack
         int alpha = Xray.getAlpha(fluidState.getBlockState(), pos);
@@ -43,8 +43,9 @@ public abstract class FluidRendererMixin {
     private void onVertex(VertexConsumer vertexConsumer, float x, float y, float z, float red, float green, float blue, float u, float v, int light, CallbackInfo info) {
         int alpha = alphas.get();
 
-        if (ambient.get()) {
-            Color color = Modules.get().get(Ambience.class).lavaColor.get();
+        Ambience ambienceModule = Modules.get().get(Ambience.class);
+        if (ambient.get() && ambienceModule != null) {
+            Color color = ambienceModule.lavaColor.get();
             vertex(vertexConsumer, x, y, z, color.r, color.g, color.b, (alpha != -1 ? alpha : color.a), u, v, light);
             info.cancel();
         }

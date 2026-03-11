@@ -42,6 +42,6 @@ public abstract class GameOptionsMixin {
 
         if (event.isCancelled()) info.cancel();
 
-        if (Modules.get().isActive(Freecam.class)) info.cancel();
+        if (Modules.get().isActive(Freecam.class)) info.cancel(); // isActive is null-safe
     }
 }

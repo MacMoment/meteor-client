@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class FireworksSparkParticleSubMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void buildExplosionGeometry(BillboardParticleSubmittable arg, Camera camera, float f, CallbackInfo ci) {
-        if (Modules.get().get(NoRender.class).noFireworkExplosions()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noFireworkExplosions()) ci.cancel();
     }
 }

@@ -61,14 +61,14 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init$chams(CallbackInfo info) {
-        chams = Modules.get().get(Chams.class);
+        chams = Modules.get().get(Chams.class); // may be null if Chams module is removed
     }
 
     // Chams - player color
 
     @WrapWithCondition(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;IIILnet/minecraft/client/texture/Sprite;ILnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;)V"))
     private <TState> boolean render$render(OrderedRenderCommandQueue instance, Model<? super TState> model, TState state, MatrixStack matrixStack, RenderLayer renderLayer, int light, int overlay, int mixColor, Sprite sprite, int outlineColor, ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand) {
-        if (!chams.isActive() || !chams.players.get() || !(((IEntityRenderState) state).meteor$getEntity() instanceof PlayerEntity player)) return true;
+        if (chams == null || !chams.isActive() || !chams.players.get() || !(((IEntityRenderState) state).meteor$getEntity() instanceof PlayerEntity player)) return true;
         if (chams.ignoreSelf.get() && player == mc.player) return true;
 
         instance.submitModel(model, state, matrixStack, renderLayer, light, overlay, PlayerUtils.getPlayerColor(player, chams.playersColor.get()).getPacked(), sprite, outlineColor, null);
@@ -79,7 +79,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
 
     @ModifyReturnValue(method = "getRenderLayer", at = @At("RETURN"))
     private RenderLayer getRenderPlayer(RenderLayer original, S state, boolean showBody, boolean translucent, boolean showOutline) {
-        if (!chams.isActive() || !(((IEntityRenderState) state).meteor$getEntity() instanceof PlayerEntity player))
+        if (chams == null || !chams.isActive() || !(((IEntityRenderState) state).meteor$getEntity() instanceof PlayerEntity player))
             return original;
 
         if (!chams.players.get() || chams.playersTexture.get())
@@ -97,9 +97,10 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
         Entity entity = ((IEntityRenderState) state).meteor$getEntity();
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
-        if (Modules.get().get(NoRender.class).noDeadEntities() && livingEntity.isDead()) ci.cancel();
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noDeadEntities() && livingEntity.isDead()) ci.cancel();
 
-        if (chams.shouldRender(entity)) {
+        if (chams != null && chams.shouldRender(entity)) {
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(1.0f, -1100000.0f);
         }
@@ -110,7 +111,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
         Entity entity = ((IEntityRenderState) state).meteor$getEntity();
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
-        if (chams.shouldRender(livingEntity)) {
+        if (chams != null && chams.shouldRender(livingEntity)) {
             glPolygonOffset(1.0f, 1100000.0f);
             glDisable(GL_POLYGON_OFFSET_FILL);
         }

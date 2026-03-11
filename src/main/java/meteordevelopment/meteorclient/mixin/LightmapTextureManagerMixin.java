@@ -32,7 +32,8 @@ public abstract class LightmapTextureManagerMixin {
 
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER), cancellable = true)
     private void update$skip(float tickProgress, CallbackInfo ci, @Local Profiler profiler) {
-        if (Modules.get().get(Fullbright.class).getGamma() || Modules.get().isActive(Xray.class)) {
+        Fullbright fullbright = Modules.get().get(Fullbright.class);
+        if ((fullbright != null && fullbright.getGamma()) || Modules.get().isActive(Xray.class)) {
             RenderSystem.getDevice().createCommandEncoder().clearColorTexture(glTexture, ColorHelper.getArgb(255, 255, 255, 255));
             profiler.pop();
             ci.cancel();
@@ -41,6 +42,7 @@ public abstract class LightmapTextureManagerMixin {
 
     @Inject(method = "getDarkness", at = @At("HEAD"), cancellable = true)
 	private void getDarknessFactor(LivingEntity entity, float factor, float tickProgress, CallbackInfoReturnable<Float> info) {
-		if (Modules.get().get(NoRender.class).noDarkness()) info.setReturnValue(0.0f);
+		NoRender noRender = Modules.get().get(NoRender.class);
+		if (noRender != null && noRender.noDarkness()) info.setReturnValue(0.0f);
 	}
 }

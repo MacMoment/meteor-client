@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class ItemGroupsMixin {
     @ModifyReturnValue(method = "updateDisplayContext", at = @At("RETURN"))
     private static boolean modifyReturn(boolean original) {
-        return original || Modules.get().get(BetterTooltips.class).updateTooltips();
+        BetterTooltips betterTooltips = Modules.get().get(BetterTooltips.class);
+        return original || (betterTooltips != null && betterTooltips.updateTooltips());
     }
 }

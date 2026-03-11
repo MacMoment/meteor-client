@@ -21,7 +21,8 @@ public abstract class ItemRendererMixin {
         argsOnly = true
     )
     private static ItemRenderState.Glint modifyEnchant(ItemRenderState.Glint glint) {
-        if (Modules.get().get(NoRender.class).noEnchantGlint()) return ItemRenderState.Glint.NONE;
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noEnchantGlint()) return ItemRenderState.Glint.NONE;
         return glint;
     }
 }

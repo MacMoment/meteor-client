@@ -23,6 +23,6 @@ public abstract class FishingBobberEntityMixin {
         if (!instance.getEntityWorld().isClient() || entity != mc.player) original.call(instance, entity);
 
         Velocity velocity = Modules.get().get(Velocity.class);
-        if (!velocity.isActive() || !velocity.fishing.get()) original.call(instance, entity);
+        if (velocity == null || !velocity.isActive() || !velocity.fishing.get()) original.call(instance, entity);
     }
 }
