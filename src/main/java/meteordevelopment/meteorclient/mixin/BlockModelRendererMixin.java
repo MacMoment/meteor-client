@@ -49,7 +49,7 @@ public abstract class BlockModelRendererMixin {
     private static boolean modifyShouldDrawFace(boolean original, BlockRenderView world, BlockState state, boolean cull, Direction side, BlockPos pos) {
         Xray xray = Modules.get().get(Xray.class);
 
-        if (xray.isActive()) {
+        if (xray != null && xray.isActive()) {
             return xray.modifyDrawSide(state, world, pos.offset(side.getOpposite()), side, original); // thanks mojang
         }
 

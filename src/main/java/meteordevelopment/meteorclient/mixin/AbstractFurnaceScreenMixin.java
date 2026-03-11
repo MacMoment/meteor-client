@@ -25,6 +25,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceScreen
     public void handledScreenTick() {
         super.handledScreenTick();
 
-        if (Modules.get().isActive(AutoSmelter.class)) Modules.get().get(AutoSmelter.class).tick(handler);
+        AutoSmelter autoSmelter = Modules.get().get(AutoSmelter.class);
+        if (autoSmelter != null && autoSmelter.isActive()) autoSmelter.tick(handler);
     }
 }

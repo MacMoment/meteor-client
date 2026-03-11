@@ -38,9 +38,11 @@ public class BlockRenderLayersMixin {
 
         else {
             Ambience ambience = Modules.get().get(Ambience.class);
-            int a = ambience.lavaColor.get().a;
-            if (ambience.isActive() && ambience.customLavaColor.get() && a > 0 && a < 255) {
-                cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
+            if (ambience != null) {
+                int a = ambience.lavaColor.get().a;
+                if (ambience.isActive() && ambience.customLavaColor.get() && a > 0 && a < 255) {
+                    cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
+                }
             }
         }
     }

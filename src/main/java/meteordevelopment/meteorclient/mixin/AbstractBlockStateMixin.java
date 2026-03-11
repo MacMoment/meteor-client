@@ -21,6 +21,7 @@ public abstract class AbstractBlockStateMixin {
     private void modifyPos(BlockPos pos, CallbackInfoReturnable<Vec3d> info) {
         if (Modules.get() == null) return;
 
-        if (Modules.get().get(NoRender.class).noTextureRotations()) info.setReturnValue(Vec3d.ZERO);
+        NoRender noRender = Modules.get().get(NoRender.class);
+        if (noRender != null && noRender.noTextureRotations()) info.setReturnValue(Vec3d.ZERO);
     }
 }

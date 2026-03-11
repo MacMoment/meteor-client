@@ -44,7 +44,7 @@ public abstract class BlockItemMixin {
     private BlockState modifyState(BlockState state, ItemPlacementContext context) {
         var noGhostBlocks = Modules.get().get(NoGhostBlocks.class);
 
-        if (noGhostBlocks.isActive() && noGhostBlocks.placing.get()) {
+        if (noGhostBlocks != null && noGhostBlocks.isActive() && noGhostBlocks.placing.get()) {
             return getPlacementState(context);
         }
 

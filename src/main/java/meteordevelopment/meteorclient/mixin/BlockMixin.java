@@ -35,11 +35,12 @@ public abstract class BlockMixin extends AbstractBlock implements ItemConvertibl
         Slippy slippy = Modules.get().get(Slippy.class);
         Block block = (Block) (Object) this;
 
-        if (slippy.isActive() && (slippy.listMode.get() == Slippy.ListMode.Whitelist ? slippy.allowedBlocks.get().contains(block) : !slippy.ignoredBlocks.get().contains(block))) {
+        if (slippy != null && slippy.isActive() && (slippy.listMode.get() == Slippy.ListMode.Whitelist ? slippy.allowedBlocks.get().contains(block) : !slippy.ignoredBlocks.get().contains(block))) {
             return slippy.friction.get().floatValue();
         }
 
-        if (block == Blocks.SLIME_BLOCK && Modules.get().get(NoSlow.class).slimeBlock()) return 0.6F;
+        NoSlow noSlow = Modules.get().get(NoSlow.class);
+        if (block == Blocks.SLIME_BLOCK && noSlow != null && noSlow.slimeBlock()) return 0.6F;
         else return original;
     }
 
@@ -50,7 +51,7 @@ public abstract class BlockMixin extends AbstractBlock implements ItemConvertibl
         if (modules == null) return;
 
         Xray xray = modules.get(Xray.class);
-        if (xray.isActive() && !xray.isBlocked(state.getBlock(), null)) {
+        if (xray != null && xray.isActive() && !xray.isBlocked(state.getBlock(), null)) {
             cir.setReturnValue(true);
         }
     }
